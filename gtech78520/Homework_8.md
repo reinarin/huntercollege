@@ -124,7 +124,8 @@ the data set, so the new data set would start from the header row.
 ``` r
 # Import the data --------------------------------------------------------------
 # World Bank for life expectancy
-lifeExpectancy <- read.csv(file = 'API_SP.DYN.LE00.IN_DS2_en_csv_v2_3852476.csv', fileEncoding="UTF-8-BOM")
+lifeExpectancy <- read.csv(file = 'API_SP.DYN.LE00.IN_DS2_en_csv_v2_3852476.csv', 
+                           fileEncoding="UTF-8-BOM")
 
 # John Hopkins for COVID-19
 covidGlobalData <- read.csv(file = 'time_series_covid19_deaths_global.csv')
@@ -179,7 +180,9 @@ covidUS_Deaths <- covidUSData %>%
   # Rename COVID-19 deaths column
   rename(cumulative_deaths = X4.3.22) %>%
   # Rename US to United States
-  mutate(country_name = ifelse(country_name == "US", "United States of America", country_name))
+  mutate(country_name = ifelse(country_name == "US", 
+                               "United States of America", 
+                               country_name))
 
 # Combine Global and US COVID-19 Deaths data
 covid_Deaths <- rbind(covidGlobal_Deaths, covidUS_Deaths) %>%
@@ -212,8 +215,11 @@ df <- population_and_country_codes %>%
   # Inner join on the country code
   inner_join(lifeExpectancy_Data, by = c("ISO3" = "Country.Code")) %>%
   inner_join(covid_Deaths, by = c("Country" = "country_name")) %>%
-  # Keep the country code, country name, 2020 population, 2019 life expectancy, indication of low/high life expectancy, cumulative COVID-19 deaths, and indication of being hit hard or not by COVID-19
-  select(ISO3, ONU, Country, population2020, life_expectancy_years, Life_Expectancy, cumulative_deaths, Hit_Hard_By_COVID19)
+  # Keep the country code, country name, 2020 population, 2019 life expectancy, 
+  # indication of low/high life expectancy, cumulative COVID-19 deaths, and 
+  # indication of being hit hard or not by COVID-19
+  select(ISO3, ONU, Country, population2020, life_expectancy_years, 
+         Life_Expectancy, cumulative_deaths, Hit_Hard_By_COVID19)
 ```
 
 ------------------------------------------------------------------------
@@ -227,10 +233,12 @@ visualizations that will help answer the analysis question directly.
 # Create data visualizations ---------------------------------------------------
 h_line <- 72.747
 
-ggplot(data = subset(df, !is.na(life_expectancy_years)), aes(x = Country, y = life_expectancy_years)) + 
+ggplot(data = subset(df, !is.na(life_expectancy_years)), 
+       aes(x = Country, y = life_expectancy_years)) + 
   geom_point(aes(colour = Life_Expectancy)) + 
   geom_hline(aes(yintercept = h_line)) + 
-  geom_text(aes(0, h_line, label = "Average Life Expectancy: 72.747 years", vjust = -1, hjust = -0.1)) + 
+  geom_text(aes(0, h_line, label = "Average Life Expectancy: 72.747 years", 
+                vjust = -1, hjust = -0.1)) + 
   labs(title = "2019 Life Expectancy",
        x = "Country",
        y = "Life Expectancy (years)") + 
@@ -238,11 +246,12 @@ ggplot(data = subset(df, !is.na(life_expectancy_years)), aes(x = Country, y = li
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, colour = 'gray50'))
 ```
 
-![](life_expectancy_covid19_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](Homework_8_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 # Create data visualizations ---------------------------------------------------
-ggplot(data = subset(df, !is.na(life_expectancy_years)), aes(x = factor(Life_Expectancy))) + 
+ggplot(data = subset(df, !is.na(life_expectancy_years)), 
+       aes(x = factor(Life_Expectancy))) + 
   geom_bar(stat="count", aes(fill = Life_Expectancy)) + 
   geom_text(stat = "count", aes(label = after_stat(count)), vjust = 1.6,
             color = "white") +
@@ -252,16 +261,18 @@ ggplot(data = subset(df, !is.na(life_expectancy_years)), aes(x = factor(Life_Exp
   theme(legend.position = "none")
 ```
 
-![](life_expectancy_covid19_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](Homework_8_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 # Create data visualizations ---------------------------------------------------
 h_line <- 3136
 
-ggplot(data = subset(df, !is.na(cumulative_deaths)), aes(x = Country, y = cumulative_deaths)) + 
+ggplot(data = subset(df, !is.na(cumulative_deaths)), 
+       aes(x = Country, y = cumulative_deaths)) + 
   geom_point(aes(colour = Hit_Hard_By_COVID19)) + 
   geom_hline(aes(yintercept = h_line)) +
-  geom_text(aes(0, h_line, label = "Median COVID-19 Cumulative Deaths: 3136 people", vjust = -1, hjust = -0.1)) + 
+  geom_text(aes(0, h_line, label = "Median COVID-19 Cumulative Deaths: 3136 people", 
+                vjust = -1, hjust = -0.1)) + 
   labs(title = "COVID-19 Cumulative Deaths (updated 2022.04.03)",
        x = "Country",
        y = "Cumulative deaths (person)") + 
@@ -269,11 +280,12 @@ ggplot(data = subset(df, !is.na(cumulative_deaths)), aes(x = Country, y = cumula
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, colour = 'gray50'))
 ```
 
-![](life_expectancy_covid19_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](Homework_8_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 # Create data visualizations ---------------------------------------------------
-ggplot(data = subset(df, !is.na(cumulative_deaths)), aes(x = factor(Hit_Hard_By_COVID19))) + 
+ggplot(data = subset(df, !is.na(cumulative_deaths)), 
+       aes(x = factor(Hit_Hard_By_COVID19))) + 
   geom_bar(stat="count", aes(fill = Hit_Hard_By_COVID19)) + 
   geom_text(stat = "count", aes(label = after_stat(count)), vjust = 1.6,
             color = "white") +
@@ -283,11 +295,12 @@ ggplot(data = subset(df, !is.na(cumulative_deaths)), aes(x = factor(Hit_Hard_By_
   theme(legend.position = "none")
 ```
 
-![](life_expectancy_covid19_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](Homework_8_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 # Create data visualizations ---------------------------------------------------
-ggplot(data = subset(df, !is.na(life_expectancy_years)), mapping = aes(x = Hit_Hard_By_COVID19, fill = Hit_Hard_By_COVID19)) + 
+ggplot(data = subset(df, !is.na(life_expectancy_years)), 
+       mapping = aes(x = Hit_Hard_By_COVID19, fill = Hit_Hard_By_COVID19)) + 
   geom_histogram(position = "identity", stat="count") + 
     geom_text(stat = "count", aes(label = after_stat(count)), vjust = 1.6,
             color = "white") +
@@ -298,7 +311,7 @@ ggplot(data = subset(df, !is.na(life_expectancy_years)), mapping = aes(x = Hit_H
     theme(legend.position = "bottom")
 ```
 
-![](life_expectancy_covid19_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](Homework_8_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 
