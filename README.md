@@ -1,1 +1,1 @@
-[Assignment 9: Link to Interactive Maps](https://rpubs.com/reinarin/894963)
+[Assignment 9 with Interactive Maps](https://rpubs.com/reinarin/894963)
