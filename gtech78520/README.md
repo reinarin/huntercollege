@@ -1,4 +1,4 @@
-[**Hunter College**](https://hunter.cuny.edu/) *Spring 2022*
+### [**Hunter College**](https://hunter.cuny.edu/) *Spring 2022*
 
 ## GTECH 78520 Data Analysis and Visualization with R
 
