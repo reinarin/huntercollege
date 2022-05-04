@@ -1,6 +1,6 @@
-### [**Hunter College**](https://hunter.cuny.edu/) *Spring 2022*
+## [**Hunter College**](https://hunter.cuny.edu/) *Spring 2022*
 
-## GTECH 78520 Data Analysis and Visualization with R
+### GTECH 78520 Data Analysis and Visualization with R
 
 **Instructor Information:**
 
@@ -8,13 +8,13 @@
 - Peter J. Marcotullio
 - Shipeng Sun
 
-### Course Description and Objectives
+#### Course Description and Objectives
 
 This course introduces the basics of R and the practical knowledge of data cleaning, re-organization, modeling, statistics, and analysis for research and visualization, particularly in geospatial fields. The class meets once a week for 3 hours per session with hands-on practices. Three different members of the Department of Geography and Environmental Science, as identified above, lead the class.
 
 The goal of the course is to introduce students to the use of R programming for univariate and multivariate analysis and visualization, mapping and spatial analysis.
 
-### Learning Outcomes
+#### Learning Outcomes
 
 At the end of the semester, students will be able to:
 
