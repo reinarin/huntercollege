@@ -763,7 +763,7 @@ studies.
     19(8), 1028–1064.
     [https://doi.org/10.1111/obr.12694.](https://doi.org/10.1111/obr.12694)
 4.  University of California, Irvine, Machine Learning Repository.
-    [https://archive.ics.uci.edu/ml/datasets/Estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition+.](https://archive.ics.uci.edu/ml/datasets/Estimation+of+obesity+levels+based+on+eating+h%20abits+and+physical+condition+)
+    [https://archive.ics.uci.edu/ml/datasets/Estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition+.](https://archive.ics.uci.edu/ml/datasets/Estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition+)
 5.  Mendoza Palechor, F., & de la Hoz Manotas, A. (2019). Dataset for
     estimation of obesity levels based on eating habits and physical
     condition in individuals from Colombia, Peru, and Mexico. Data in
