@@ -27,4 +27,6 @@ At the end of the semester, students will be able to:
 
 ----------
 
-[Assignment 9 with Interactive Maps](https://rpubs.com/reinarin/894963)
+### Additional:
+
+- [Assignment 9 with Interactive Maps](https://rpubs.com/reinarin/894963)
