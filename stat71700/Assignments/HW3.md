@@ -38,7 +38,7 @@ y_Sigma
 
 ------------------------------------------------------------------------
 
-## a) Find the distribution of z = ![2y\_{1} - y\_{2} + 3y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;2y_%7B1%7D%20-%20y_%7B2%7D%20%2B%203y_%7B3%7D "2y_{1} - y_{2} + 3y_{3}").
+## a) Find the distribution of ![z = 2y\_{1} - y\_{2} + 3y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z%20%3D%202y_%7B1%7D%20-%20y_%7B2%7D%20%2B%203y_%7B3%7D "z = 2y_{1} - y_{2} + 3y_{3}").
 
 ``` r
 # declare variable a
@@ -76,8 +76,8 @@ transpose_a_sigma_a
     ##      [,1]
     ## [1,]   21
 
-The distribution of z =
-![2y\_{1} - y\_{2} + 3y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;2y_%7B1%7D%20-%20y_%7B2%7D%20%2B%203y_%7B3%7D "2y_{1} - y_{2} + 3y_{3}")
+The distribution of
+![z = 2y\_{1} - y\_{2} + 3y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z%20%3D%202y_%7B1%7D%20-%20y_%7B2%7D%20%2B%203y_%7B3%7D "z = 2y_{1} - y_{2} + 3y_{3}")
 is
 ![N\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_%7B3%7D "N_{3}")(17,21).
 
