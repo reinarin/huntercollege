@@ -76,11 +76,7 @@ transpose_a_sigma_a
     ## [1,]   21
 
 The distribution of z =
-2![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
--
-![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
-3![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
+2![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")-![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")+3![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
 is
 ![N\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_%7B3%7D "N_{3}")(17,21).
 
