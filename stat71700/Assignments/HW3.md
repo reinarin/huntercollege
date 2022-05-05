@@ -8,6 +8,7 @@ Reina Li
 library(here)
 library(tidyverse)
 library(dedupewider)
+library(MASS)
 ```
 
 # 4.10 Suppose y is ![N\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_%7B3%7D "N_{3}") (![\\mu](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%5Cmu "\mu"),![\\Sigma](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%5CSigma "\Sigma")), where ![{\\mu} = \\left(\\begin{array}{rrr}3 \\\\1 \\\\4\\end{array}\\right), {\\Sigma} = \\left(\\begin{array}{rrr}6 & 1 & -2 \\\\1 & 13 & 4 \\\\-2 & 4 & 4\\end{array}\\right)](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%7B%5Cmu%7D%20%3D%20%5Cleft%28%5Cbegin%7Barray%7D%7Brrr%7D3%20%5C%5C1%20%5C%5C4%5Cend%7Barray%7D%5Cright%29%2C%20%7B%5CSigma%7D%20%3D%20%5Cleft%28%5Cbegin%7Barray%7D%7Brrr%7D6%20%26%201%20%26%20-2%20%5C%5C1%20%26%2013%20%26%204%20%5C%5C-2%20%26%204%20%26%204%5Cend%7Barray%7D%5Cright%29 "{\mu} = \left(\begin{array}{rrr}3 \\1 \\4\end{array}\right), {\Sigma} = \left(\begin{array}{rrr}6 & 1 & -2 \\1 & 13 & 4 \\-2 & 4 & 4\end{array}\right)")
@@ -37,7 +38,7 @@ y_Sigma
 
 ------------------------------------------------------------------------
 
-## a) Find the distribution of z = 2![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}") - ![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}") + 3![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}").
+## a) Find the distribution of z = ![2y\_{1} - y\_{2} + 3y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;2y_%7B1%7D%20-%20y_%7B2%7D%20%2B%203y_%7B3%7D "2y_{1} - y_{2} + 3y_{3}").
 
 ``` r
 # declare variable a
@@ -76,13 +77,13 @@ transpose_a_sigma_a
     ## [1,]   21
 
 The distribution of z =
-2![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")-![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")+3![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
+![2y\_{1} - y\_{2} + 3y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;2y_%7B1%7D%20-%20y_%7B2%7D%20%2B%203y_%7B3%7D "2y_{1} - y_{2} + 3y_{3}")
 is
 ![N\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_%7B3%7D "N_{3}")(17,21).
 
 ------------------------------------------------------------------------
 
-## b) Find the joint distribution of ![z\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B1%7D "z_{1}") = ![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}") + ![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}") + ![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}") and ![z\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B2%7D "z_{2}") = ![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}") - ![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}") + ![2y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;2y_%7B3%7D "2y_{3}").
+## b) Find the joint distribution of ![z\_{1} = y\_{1} + y\_{2} + y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B1%7D%20%3D%20y_%7B1%7D%20%2B%20y_%7B2%7D%20%2B%20y_%7B3%7D "z_{1} = y_{1} + y_{2} + y_{3}") and ![z\_{2} = y\_{1} - y\_{2} + 2y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B2%7D%20%3D%20y_%7B1%7D%20-%20y_%7B2%7D%20%2B%202y_%7B3%7D "z_{2} = y_{1} - y_{2} + 2y_{3}").
 
 ``` r
 # declare variable A
@@ -122,21 +123,9 @@ A_sigma_transpose_A
     ## [2,]   -1    9
 
 The joint distribution of
-![z\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B1%7D "z_{1}")
-=
-![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
-![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
-![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
+![z\_{1} = y\_{1} + y\_{2} + y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B1%7D%20%3D%20y_%7B1%7D%20%2B%20y_%7B2%7D%20%2B%20y_%7B3%7D "z_{1} = y_{1} + y_{2} + y_{3}")
 and
-![z\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B2%7D "z_{2}")
-=
-![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
--
-![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
-![2y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;2y_%7B3%7D "2y_{3}")
+![z\_{2} = y\_{1} - y\_{2} + 2y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B2%7D%20%3D%20y_%7B1%7D%20-%20y_%7B2%7D%20%2B%202y_%7B3%7D "z_{2} = y_{1} - y_{2} + 2y_{3}")
 is
 ![N\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;N_%7B2%7D "N_{2}")
 \[![\\left(\\begin{array}{rrr}8 \\\\10 \\end{array}\\right), \\left(\\begin{array}{rrr}29 & -1 \\\\-1 & 9\\end{array}\\right)](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%5Cleft%28%5Cbegin%7Barray%7D%7Brrr%7D8%20%5C%5C10%20%5Cend%7Barray%7D%5Cright%29%2C%20%5Cleft%28%5Cbegin%7Barray%7D%7Brrr%7D29%20%26%20-1%20%5C%5C-1%20%26%209%5Cend%7Barray%7D%5Cright%29 "\left(\begin{array}{rrr}8 \\10 \end{array}\right), \left(\begin{array}{rrr}29 & -1 \\-1 & 9\end{array}\right)")\].
@@ -240,8 +229,7 @@ is
 ``` r
 table_3_7 <- readr::read_delim(here("ma_book_data","T3_7_BONE.DAT"), delim = " ", col_names = c("ObsNum", "y1", "y2", "y3", "y4"), show_col_types = F)
 mat_3_7 <- na_move(table_3_7)
-mat_3_7 <- mat_3_7 %>%
-  select(ObsNum, y1, y2, y3, y4)
+mat_3_7 <- mat_3_7[,1:5]
 mat_3_7$ObsNum <- as.numeric(mat_3_7$ObsNum)
 mat_3_7$y1 <- as.numeric(mat_3_7$y1)
 mat_3_7$y2 <- as.numeric(mat_3_7$y2)
@@ -596,12 +584,6 @@ mat_3_3 <- as.matrix(table_3_3)
 ```
 
 ``` r
-library(dplyr)
-library(ggplot2)
-library(MASS)
-```
-
-``` r
 df_3_3 <- as.data.frame(table_3_3)
 
 # b
@@ -774,7 +756,7 @@ hist(Ca)
 hist(Cu)
 ```
 
-![](HW3_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](HW3_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 ``` r
 par(mfrow=c(1,3))
@@ -783,7 +765,7 @@ bc_ca <- boxcox(model_ca)
 bc_cu <- boxcox(model_cu)
 ```
 
-![](HW3_files/figure-gfm/unnamed-chunk-29-2.png)<!-- -->
+![](HW3_files/figure-gfm/unnamed-chunk-28-2.png)<!-- -->
 
 ``` r
 # print the transformed plot
@@ -793,7 +775,7 @@ hist(transform_bc_ca)
 hist(transform_bc_cu)
 ```
 
-![](HW3_files/figure-gfm/unnamed-chunk-29-3.png)<!-- -->
+![](HW3_files/figure-gfm/unnamed-chunk-28-3.png)<!-- -->
 
 ``` r
 # print the lambdas
@@ -847,13 +829,13 @@ car::bcPower(mat_3_3[,4:6, drop = F], coef(bc_trans)) %>%
   pairs()
 ```
 
-![](HW3_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](HW3_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 ``` r
 mat_3_3[,4:6, drop = F] %>% pairs
 ```
 
-![](HW3_files/figure-gfm/unnamed-chunk-31-2.png)<!-- -->
+![](HW3_files/figure-gfm/unnamed-chunk-30-2.png)<!-- -->
 
 ``` r
 l_lambda <- function(lambda, y)
@@ -868,7 +850,7 @@ f_out <- sapply(try_lams, l_lambda, y = mat_3_3[, 3])
 plot(try_lams, f_out)
 ```
 
-![](HW3_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](HW3_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 ``` r
 try_lams[which.max(f_out)]
