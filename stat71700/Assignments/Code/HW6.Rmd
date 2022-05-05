@@ -1,0 +1,167 @@
+---
+title: "HW6"
+author: "Reina Li"
+date: "11/11/2021"
+output: github_document
+---
+
+```{r, echo = TRUE, include = TRUE, results = FALSE, warning = FALSE, message = FALSE}
+# load libraries
+library(here)
+library(ggplot2)
+library(dplyr)
+library(matlib)
+library(sem)
+```
+
+# The matrix below shows the correlations between ratings on nine statements about pain made by 123 people suffering from extreme pain. Each statement was scored on a scale from 1 to 6, ranging from agreement to disagreement. The nine pain statements were as follows:
+
+1. Whether or not I am in pain in the future depends on the skills of the doctors.
+2. Whenever I am in pain, it is usually because of something I have done or not done.
+3. Whether or not I am in pain depends on what the doctors do for me.
+4. I cannot get any help for my pain unless I go to seek medical advice.
+5. When I am in pain I know that it is because I have not been taking proper exercise or eating the right food.
+6. People's pain results from their own carelessness.
+7. I am directly responsible for my pain.
+8. Relief from pain is chiefly controlled by the doctors.
+9. People who are never in pain are just plain lucky.
+
+```{r}
+# create the correlation matrix
+R <- matrix(data = c(1,-0.04,0.61,0.45,0.03,-0.29,-0.30,0.45,0.30,-0.04,1,-0.07,-0.12,0.49,0.43,0.30,-0.31,-0.17,0.61,-0.07,1,0.59,0.03,-0.13,-0.24,0.59,0.32,0.45,-0.12,0.59,1,-0.08,-0.21,-0.19,0.63,0.37,0.03,0.49,0.03,-0.08,1,0.47,0.41,-0.14,-0.24,-0.29,0.43,-0.13,-0.21,0.47,1,0.63,-0.13,-0.15,-0.30,0.30,-0.24,-0.19,0.41,0.63,1,-0.26,-0.29,0.45,-0.31,0.59,0.63,-0.14,-0.13,-0.26,1,0.40,0.30,-0.17,0.32,0.37,-0.24,-0.15,-0.29,0.40,1), ncol=9, byrow = TRUE)
+```
+
+## 5.6
+
+### a) Perform a principal components analysis on these data, and examine the associated scree plot to decide on the appropriate number of components.
+
+```{r}
+# apply pca to correlation matrix, R
+pain_pcacor <- princomp(covmat = R)
+vals <- summary(pain_pcacor, loadings = TRUE)
+vals
+```
+
+```{r}
+# calculate eigenvectors and eigenvalues
+eigens <- eigen(R)
+
+# create a scree plot for R
+qplot(c(1:9), eigens$values) +
+  geom_line() + 
+  xlab("Eigenvalue Number") + 
+  ylab("Eigenvalue Size") + 
+  ggtitle("Scree Plot for R")
+```
+
+Based on the associated scree plot above, 2 components should be retained.
+
+### b) Apply maximum likelihood factor analysis, and use the test described in the chapter to select the necessary number of common factors.
+
+```{r}
+sapply(1:3, function(nf)
+  factanal(covmat = R, factors = nf, n.obs = 123)$PVAL)
+pain_fa <- factanal(covmat = R, factors = 3, n.obs = 123, rotation = "none")
+pain_fa
+```
+
+### c) Rotate the factor solution selected using both an orthogonal and an oblique procedure, and interpret the results.
+
+```{r}
+# orthogonal procedure
+pain_orthogonal <- factanal(covmat = R, factors = 3, n.obs = 123, rotation = "varimax")
+pain_orthogonal
+```
+
+```{r}
+# oblique procedure
+pain_oblique <- factanal(covmat = R, factors = 3, n.obs = 123, rotation = "promax")
+pain_oblique
+```
+
+Looking at the factor correlations from the oblique rotation, it seems like there is low correlation between each of the factors, which may indicate that the factors are uncorrelated, so the orthogonal rotation is more appropriate.
+
+-----
+
+## 7.1
+
+### Fit a correlated two-factor model in which questions 1, 3, 4, and 8 are assumed to be indicators of the latent variable Doctor's Responsibility and questions 2, 5, 6, and 7 are assumed to be indicators of the latent variable Patient's Responsibility. Find a 95% confidence interval for the correlation between the two latent variables.
+
+model:
+
+$Q1 = \lambda_{1}f_{1} + 0f_{2} + \mu_{1}$
+
+$Q2 = 0f_{1} + \lambda_{2}f_{2} + \mu_{2}$
+
+$Q3 = \lambda_{3}f_{1} + 0f_{2} + \mu_{3}$
+
+$Q4 = \lambda_{4}f_{1} + 0f_{2} + \mu_{4}$
+
+$Q5 = 0f_{1} + \lambda_{5}f_{2} + \mu_{5}$
+
+$Q6 = 0f_{1} + \lambda_{6}f_{2} + \mu_{6}$
+
+$Q7 = 0f_{1} + \lambda_{7}f_{2} + \mu_{7}$
+
+$Q8 = \lambda_{8}f_{1} + 0f_{2} + \mu_{8}$
+
+The model is specified in a text file called "pain_model.txt" with the following content:
+
+Doc_Responsibility -> Q1, lambda1, NA
+
+Patient_Respons -> Q2, lambda2, NA
+
+Doc_Responsibility -> Q3, lambda3, NA
+
+Doc_Responsibility -> Q4, lambda4, NA
+
+Patient_Respons -> Q5, lambda5, NA
+
+Patient_Respons -> Q6, lambda6, NA
+
+Patient_Respons -> Q7, lambda7, NA
+
+Doc_Responsibility -> Q8, lambda8, NA
+
+Doc_Responsibility <-> Patient_Respons, rho, NA
+
+Q1 <-> Q1, theta1, NA
+
+Q2 <-> Q2, theta2, NA
+
+Q3 <-> Q3, theta3, NA
+
+Q4 <-> Q4, theta4, NA
+
+Q5 <-> Q5, theta5, NA
+
+Q6 <-> Q6, theta6, NA
+
+Q7 <-> Q7, theta6, NA
+
+Q8 <-> Q8, theta6, NA
+
+Doc_Responsibility <-> Doc_Responsibility, NA, 1
+
+Patient_Respons <-> Patient_Respons, NA, 1
+
+```{r, echo = TRUE, include = TRUE, results = FALSE, warning = FALSE, message = FALSE}
+pain_model <- specify.model(file = "pain_model.txt")
+pain_sem <- sem(pain_model, R, 123)
+pain_sem
+summary(pain_sem)
+```
+
+The estimate is (rho values) 0.4461005 and the standard error is 0.07830070.
+
+```{r}
+# 95% CI
+pain_estimate <- 0.4461005
+pain_se <- 0.07830070
+lower_bound <- pain_estimate - qnorm(0.05/2, lower.tail = F) * pain_se
+lower_bound
+upper_bound <- pain_estimate + qnorm(0.05/2, lower.tail = F) * pain_se
+upper_bound
+```
+
+An approximate 95% confidence interval for the correlation between the two latent variables is [`r lower_bound`, `r upper_bound`].

@@ -1,0 +1,73 @@
+---
+title: "HW1"
+author: "Reina Li"
+date: "8/26/2021"
+output:
+  github_document: default
+---
+
+# 2.7
+
+```{r}
+# initialize matrices
+A <- matrix(data = c(1,-1,4,-1,1,3,4,3,2), ncol = 3)
+B <- matrix(data = c(3,7,2,-2,1,3,4,0,5), ncol = 3)
+x <- matrix(data = c(1,-1,2), ncol = 1)
+y <- matrix(data = c(3,2,1), ncol =1)
+```
+
+Find the following:
+
+(a) Bx
+
+```{r}
+B %*% x
+```
+
+(b) y'B
+
+```{r}
+t(y) %*% B
+```
+
+(c) x'Ax
+
+```{r}
+t(x) %*% A %*% x
+```
+
+(d) x'Ay
+
+```{r}
+t(x) %*% A %*% y
+```
+
+(e) x'x
+
+```{r}
+t(x) %*% x
+```
+
+(f) x'y
+
+```{r}
+t(x) %*% y
+```
+
+(g) xx'
+
+```{r}
+x %*% t(x)
+```
+
+(h) xy'
+
+```{r}
+x %*% t(y)
+```
+
+(i) B'B
+
+```{r}
+t(B) %*% B
+```

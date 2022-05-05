@@ -1,0 +1,43 @@
+---
+title: "HW2"
+author: "Reina Li"
+date: "9/9/2021"
+output:
+  github_document: default
+---
+
+# Visualizing Multivariate Categorical Data Using Balloon Plot
+
+In a balloon plot, the area of the dots is proportional to their numerical value.
+
+http://www.sthda.com/english/articles/32-r-graphics-essentials/129-visualizing-multivariate-categorical-data/
+
+```{r, warning = FALSE, message = FALSE}
+# load packages
+library(ggplot2)
+library(ggpubr)
+```
+
+```{r, warning = FALSE, message = FALSE}
+#load demo data set "Housetasks"
+housetasks <- read.delim(
+  system.file("demo-data/housetasks.txt",package="ggpubr"),
+  row.names=1
+)
+```
+
+```{r, warning = FALSE, message = FALSE}
+#print data set
+housetasks
+```
+
+```{r, warning = FALSE, message = FALSE}
+#create balloon plot
+ggballoonplot(housetasks,fill="value")+scale_fill_viridis_c(option="C")
+```
+
+Housetasks such as dinner, breakfast, and laundry are done more often by the wife.
+
+Driving and repairs are done more often by the husband.
+
+Finances, insurance, and holidays are done often jointly.

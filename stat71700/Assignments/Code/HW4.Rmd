@@ -1,0 +1,261 @@
+---
+title: "HW4"
+author: "Reina Li"
+date: "9/30/2021"
+output: github_document
+---
+
+# 1. Evaluate the power differences between the multivariate T2 test and other options try to use at least 10,000 samples
+
+## a) Use the code in the example as a starting point. Simulate data so that the average pictoral test is 1 unit higher in d2.
+  
+```{r, echo = TRUE, include = TRUE, results = FALSE, warning = FALSE, message = FALSE}
+# load libraries
+library(dplyr)
+library(ggplot2)
+library(here)
+library(mvtnorm)
+```
+
+```{r, echo = TRUE, include = FALSE, results = FALSE, warning = FALSE, message = FALSE}
+# read in data
+table_5_1 <- readr::read_fwf(here('ma_book_data','T5_1_PSYCH.DAT'))
+table_5_1 <- table_5_1 %>% 
+  mutate(X1 = ifelse(X1 == 1, 'M', 'F')) 
+colnames(table_5_1) <- c("gender", "pictoral", "paper", "tool", "vocab")
+```
+
+```{r}
+start_data <- as.matrix(table_5_1[-1])
+(mu <- colMeans(start_data))
+(Sigma <- cov(start_data))
+cor(start_data)
+```
+
+```{r}
+t2_stat <- function(prob, p, nu) {
+  # based on Eq 5.7
+  qf(p = prob,  df1 = p, df2 = nu - p + 1) * 
+    nu * p/(nu - p + 1)
+}
+```
+
+```{r}
+set.seed(1234)
+calc_t2_stat <- function(x, y) {
+  calcs <- list(x, y) %>%
+    purrr::map(function(i) {
+      list(y = colMeans(i),
+           S = cov(i),
+           n = nrow(i))
+    })
+  
+  
+  S_pl <- 1 / (calcs[[1]]$n + calcs[[2]]$n - 2) *
+    (((calcs[[1]]$n - 1) * calcs[[1]]$S) + ((calcs[[2]]$n - 1) * calcs[[2]]$S))
+  
+  S_pl12 <- S_pl[1:2,1:2]
+  S_pl34 <- S_pl[3:4,3:4]
+  
+  T2 <-
+    (calcs[[1]]$n * calcs[[2]]$n) / (calcs[[1]]$n + calcs[[2]]$n) *
+    t(calcs[[1]]$y - calcs[[2]]$y) %*% solve(S_pl) %*% (calcs[[1]]$y - 
+                                                          calcs[[2]]$y)
+  
+  T2_val_12 <- (calcs[[1]]$n * calcs[[2]]$n)/(calcs[[1]]$n + calcs[[2]]$n) * 
+    t(matrix(data=c(calcs[[1]]$y[1]-calcs[[2]]$y[1],
+    calcs[[1]]$y[2]-calcs[[2]]$y[2]))) %*% solve(S_pl12) %*% 
+    (matrix(data=c(calcs[[1]]$y[1]-calcs[[2]]$y[1],calcs[[1]]$y[2]-calcs[[2]]$y[2])))
+  T2_val_34 <- (calcs[[1]]$n * calcs[[2]]$n)/(calcs[[1]]$n + calcs[[2]]$n) * 
+    t(matrix(data=c(calcs[[1]]$y[3]-calcs[[2]]$y[3],
+    calcs[[1]]$y[4]-calcs[[2]]$y[4]))) %*% solve(S_pl12) %*% 
+    (matrix(data=c(calcs[[1]]$y[3]-calcs[[2]]$y[3],
+    calcs[[1]]$y[4]-calcs[[2]]$y[4])))
+  
+  test_stat_12 <- (calcs[[1]]$n + calcs[[2]]$n - 2 - 2) * ((T2 - T2_val_12) / 
+    (calcs[[1]]$n + calcs[[2]]$n - 2 + T2_val_12))
+  test_stat_34 <- (calcs[[1]]$n + calcs[[2]]$n - 2 - 2) * ((T2 - T2_val_34) / 
+    (calcs[[1]]$n + calcs[[2]]$n - 2 + T2_val_34))
+  
+  hypo_test12 <- 'Blank'
+  
+  if (test_stat_12 > T2_val_12) {
+  hypo_test12 <-'Reject'
+} else {
+  hypo_test12 <- 'Fail to reject'
+}
+  
+  hypo_test34 <- 'Blank'
+  
+  if (test_stat_34 > T2_val_34) {
+  hypo_test34 <-'Reject'
+} else {
+  hypo_test34 <- 'Fail to reject'
+}
+  
+  list(S_pl = S_pl,
+       S_pl12 = S_pl12,
+       S_pl34 = S_pl34,
+       T2_val_12 = as.numeric(T2_val_12),
+       T2_val_34 = as.numeric(T2_val_34),
+       test_stat_12 = as.numeric(test_stat_12),
+       test_stat_34 = as.numeric(test_stat_34),
+       hypo_test12 = hypo_test12,
+       hypo_test34 = hypo_test34,
+       # convert from matrix to atomic
+       T2 = as.numeric(T2))
+}
+```
+
+```{r}
+# test at least 10,000 samples
+test_char <- purrr::map_dfr(1:10000, function(iter) {
+  d1 <- rmvnorm(100, mean = mu, sigma = Sigma)
+  
+  mu2 <- mu
+  # The average pictoral test is 1 unit higher in d2
+  mu2[1] <- mu2[1] + 1
+  d2 <- rmvnorm(100, mean = mu2, sigma = Sigma)
+  
+  t2_stat_samp <- calc_t2_stat(d1, d2)
+  t2_comp <- t2_stat(1 - .05, p = ncol(d1), nrow(d1) + nrow(d2) - 2)
+  
+  # calculate univariate tests for each column and extract p.value
+  uni_t_tests <- purrr::map_dbl(1:ncol(d1), function(j) {
+    t.test(d1[,j], d2[,j] )$p.value
+  })
+  
+  a_vect <- solve(t2_stat_samp$S_pl) %*% (colMeans(d1) - colMeans(d2))
+  # turn a_vect into a vector instead of a column vector
+  a_vect <- abs(as.numeric(a_vect))
+  data.frame(
+    T2 = t2_stat_samp$T2,
+    t2_comp = t2_comp,
+    
+    pictoral_uni_t_test = uni_t_tests[1],
+    paper_uni_t_test = uni_t_tests[2],
+    tool_uni_t_test = uni_t_tests[3],
+    vocab_uni_t_test = uni_t_tests[4],
+    
+    pictoral_discrim = a_vect[1],
+    paper_discrim = a_vect[2],
+    tool_discrim = a_vect[3],
+    vocab_discrim = a_vect[4],
+    
+    # new columns
+    T2_pictoral_paper = t2_stat_samp$T2_val_12,
+    T2_comp_pictoral_paper = t2_stat_samp$test_stat_12,
+    hypo_test12 = t2_stat_samp$hypo_test12,
+    T2_tool_vocab = t2_stat_samp$T2_val_34,
+    T2_comp_tool_vocab = t2_stat_samp$test_stat_34,
+    hypo_test34 = t2_stat_samp$hypo_test34
+  )
+})
+```
+
+-----
+
+## b) What's the power of detecting a difference in d1 and d2 using the multivariate T2?
+
+```{r}
+mean(with(test_char, T2 > t2_comp))
+```
+
+The power of detecting a difference in d1 and d2 using the multivariate T2 is `r mean(with(test_char, T2 > t2_comp))`.
+
+-----
+
+## c) What's the power of finding a difference in just the pictoral column?
+
+```{r}
+mean(with(test_char, pictoral_uni_t_test < .05))
+```
+
+The power of finding a difference in just the pictoral column is `r mean(with(test_char, pictoral_uni_t_test < .05))`.
+
+-----
+
+### Comment on the difference between this and the previous power.
+
+The power of detecting a difference in d1 and d2 using the multivariate T2 is greater than the power of finding a difference in just the pictoral column. That means that there is a smaller risk of committing Type 2 errors for the former. The latter has a larger risk of committing Type 2 errors.
+
+-----
+
+## d) What's the power of finding a difference between the two data sets using procedure 1 or procedure 2 in the book? What's the problem with using these two methods?
+
+```{r}
+# procedure 1
+t.test(pictoral ~ gender, data = table_5_1)
+t.test(paper ~ gender, data = table_5_1)
+t.test(tool ~ gender, data = table_5_1)
+t.test(vocab ~ gender, data = table_5_1)
+
+# sample experiment wise false positive rate
+mean(with(test_char, pictoral_uni_t_test < .05 | paper_uni_t_test < .05 | 
+            tool_uni_t_test < .05 | vocab_uni_t_test < .05))
+# expected experiment wise false positive
+1 - (1 - .05)^4
+```
+
+```{r}
+# procedure 2
+# sample experiment wise false positive rate (bonferroni correction)
+mean(with(test_char, pictoral_uni_t_test < .05/4 | paper_uni_t_test < .05/4 | 
+            tool_uni_t_test < .05/4 | vocab_uni_t_test < .05/4))
+# expected bonferroni correction fp
+1 - (1 - .05/4)^4
+```
+
+The power of finding a difference between the two data sets using procedure 1 is `r mean(with(test_char, pictoral_uni_t_test < .05 | paper_uni_t_test < .05 | tool_uni_t_test < .05 | vocab_uni_t_test < .05))`.
+
+The power of finding a difference between the two data sets using procedure 2 is `r mean(with(test_char, pictoral_uni_t_test < .05/4 | paper_uni_t_test < .05/4 | tool_uni_t_test < .05/4 | vocab_uni_t_test < .05/4))`.
+
+(pages 140-141)
+
+In the book, procedure 1 is performing univariate t-tests, one for each variable.Procedure 2 is adjusting the $\alpha$-level resulting from performing the p tests (use Bonferroni critical value $t_{\alpha/2p,n_{1}+n_{2}-2}$).
+
+They are both univariate approaches that do not use covariances or correlations among the variables when computing the test statistic. The problem with using these two methods is that we are performing only univariate tests with no T2-test. The overall $\alpha$ in procedure 1 is too high, and the overall $\alpha$ in procedure 2 is too low. But it these procedures are only performed *after* T2-test rejects, then the tests will reject less often (experimentwise error rates change).
+
+-----
+
+## e) What's the power of the pictoral column having the largest determinant value given the multivariate T2 was significant?
+
+```{r}
+mean(with(test_char, pictoral_discrim > paper_discrim & pictoral_discrim > 
+            tool_discrim & pictoral_discrim > vocab_discrim & T2 > t2_comp))
+```
+
+The power of the pictoral column having the largest discriminant value given the multivariate T2 was significant is `r mean(with(test_char, pictoral_discrim > paper_discrim & pictoral_discrim > tool_discrim & pictoral_discrim > vocab_discrim & T2 > t2_comp))`.
+
+-----
+
+# 2. Evaluate the 'additional information' T2 statistics.
+
+## a) Using the parameters above, add a new 'column' to the output data frame which checks to see how often:
+
+### 1. The first two columns (pictoral and paper) help split the data
+
+### 2. The second two columns (tool and vocab) help to split the data
+
+```{r}
+# show first 6 rows
+head(test_char)
+# show last 6 rows
+tail(test_char)
+```
+
+**Note: I added a few new columns to the output data frame:**
+
+- **T2_pictoral_paper**: this is the T2 value we calculated for pictoral and paper
+- **T2_comp_pictoral_paper**: this is the T2 test statistic value for pictoral and paper
+
+- **hypo_test12**:
+  - ***Reject***: Reject the hypothesis that x = (y3,y4)' = (tool and vocab)' is redundant, and  conclude that x = (y3,y4)' = (tool and vocab)' adds a significant amount of separation to y = (y1,y2)' = (pictoral and paper)'
+  - ***Fail to reject***: We fail to reject the hypothesis that x = (y3,y4)' = (tool and vocab)' is redundant
+  
+- **T2_tool_vocab**: this is the T2 value we calculated for tool and vocab
+- **T2_comp_tool_vocab**: this is the T2 test statistic value for tool and vocab
+
+- **hypo_test34**:
+  - ***Reject***: Reject the hypothesis that x = (y1,y2)' = (pictoral and paper)' is redundant, and conclude that x = (y1,y2)' = (pictoral and paper)' adds a significant amount of separation to y = (y1,y2)' = (tool and vocab)'
+  - ***Fail to reject***: We fail to reject the hypothesis that x = (y1,y2)' = (pictoral and paper)' is redundant
