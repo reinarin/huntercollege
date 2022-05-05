@@ -141,65 +141,35 @@ eigen_vals$vectors
 
 ### The principal components of S are:
 
-![z\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B1%7D "z_{1}")
-=
--4.0003382^{-4}![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
-0.008043![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--0.1547283![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
--0.7429698![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
--0.6511453![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{1} = -4.0003382\\times 10^{-4}y\_{1} + 0.008043y\_{2} + -0.1547283y\_{3} + -0.7429698y\_{4} + -0.6511453y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B1%7D%20%3D%20-4.0003382%5Ctimes%2010%5E%7B-4%7Dy_%7B1%7D%20%2B%200.008043y_%7B2%7D%20%2B%20-0.1547283y_%7B3%7D%20%2B%20-0.7429698y_%7B4%7D%20%2B%20-0.6511453y_%7B5%7D%0A "
+z_{1} = -4.0003382\times 10^{-4}y_{1} + 0.008043y_{2} + -0.1547283y_{3} + -0.7429698y_{4} + -0.6511453y_{5}
+")
 
-![z\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B2%7D "z_{2}")
-=
-7.7976308^{-4}![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
--0.0166018![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--0.6382202![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
--0.4279398![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
-0.6397392![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{2} = 7.7976308\\times 10^{-4}y\_{1} + -0.0166018y\_{2} + -0.6382202y\_{3} + -0.4279398y\_{4} + 0.6397392y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B2%7D%20%3D%207.7976308%5Ctimes%2010%5E%7B-4%7Dy_%7B1%7D%20%2B%20-0.0166018y_%7B2%7D%20%2B%20-0.6382202y_%7B3%7D%20%2B%20-0.4279398y_%7B4%7D%20%2B%200.6397392y_%7B5%7D%0A "
+z_{2} = 7.7976308\times 10^{-4}y_{1} + -0.0166018y_{2} + -0.6382202y_{3} + -0.4279398y_{4} + 0.6397392y_{5}
+")
 
-![z\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B3%7D "z_{3}")
-=
--0.0017907![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
--0.0285905![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--0.7535103![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
-0.5144686![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
--0.4083182![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{3} = -0.0017907y\_{1} + -0.0285905y\_{2} + -0.7535103y\_{3} + 0.5144686y\_{4} + -0.4083182y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B3%7D%20%3D%20-0.0017907y_%7B1%7D%20%2B%20-0.0285905y_%7B2%7D%20%2B%20-0.7535103y_%7B3%7D%20%2B%200.5144686y_%7B4%7D%20%2B%20-0.4083182y_%7B5%7D%0A "
+z_{3} = -0.0017907y_{1} + -0.0285905y_{2} + -0.7535103y_{3} + 0.5144686y_{4} + -0.4083182y_{5}
+")
 
-![z\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B4%7D "z_{4}")
-=
--0.0028537![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
--0.9994168![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
-0.0309148![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
--0.0135906![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
--0.0041821![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{4} = -0.0028537y\_{1} + -0.9994168y\_{2} + 0.0309148y\_{3} + -0.0135906$\_{4} + -0.0041821y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B4%7D%20%3D%20-0.0028537y_%7B1%7D%20%2B%20-0.9994168y_%7B2%7D%20%2B%200.0309148y_%7B3%7D%20%2B%20-0.0135906%24_%7B4%7D%20%2B%20-0.0041821y_%7B5%7D%0A "
+z_{4} = -0.0028537y_{1} + -0.9994168y_{2} + 0.0309148y_{3} + -0.0135906$_{4} + -0.0041821y_{5}
+")
 
-![z\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B5%7D "z_{5}")
-=
-0.9999939![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
--0.0028871![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--8.2536631^{-4}![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
-9.1898416^{-4}![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
--0.0015025![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{5} = 0.9999939y\_{1} + -0.0028871y\_{2} + -8.2536631\\times 10^{-4}y\_{3} + 9.1898416\\times 10^{-4}y\_{4} + -0.0015025y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B5%7D%20%3D%200.9999939y_%7B1%7D%20%2B%20-0.0028871y_%7B2%7D%20%2B%20-8.2536631%5Ctimes%2010%5E%7B-4%7Dy_%7B3%7D%20%2B%209.1898416%5Ctimes%2010%5E%7B-4%7Dy_%7B4%7D%20%2B%20-0.0015025y_%7B5%7D%0A "
+z_{5} = 0.9999939y_{1} + -0.0028871y_{2} + -8.2536631\times 10^{-4}y_{3} + 9.1898416\times 10^{-4}y_{4} + -0.0015025y_{5}
+")
 
 ### The eigenvalues of R are as follows:
 
@@ -234,65 +204,35 @@ eigens$vectors
 
 ### The principal components of R are:
 
-![z\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B1%7D "z_{1}")
-=
--0.4155304![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
--0.0735223![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--0.3639566![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
--0.5421958![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
--0.6288786![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{1} = -0.4155304y\_{1} + -0.0735223y\_{2} + -0.3639566y\_{3} + -0.5421958y\_{4} + -0.6288786y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B1%7D%20%3D%20-0.4155304y_%7B1%7D%20%2B%20-0.0735223y_%7B2%7D%20%2B%20-0.3639566y_%7B3%7D%20%2B%20-0.5421958y_%7B4%7D%20%2B%20-0.6288786y_%7B5%7D%0A "
+z_{1} = -0.4155304y_{1} + -0.0735223y_{2} + -0.3639566y_{3} + -0.5421958y_{4} + -0.6288786y_{5}
+")
 
-![z\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B2%7D "z_{2}")
-=
--0.5295048![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
--0.684079![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--0.1974475![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
-0.4258696![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
-0.1769468![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{2} = -0.5295048y\_{1} + -0.684079y\_{2} + -0.1974475y\_{3} + 0.4258696y\_{4} + 0.1769468y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B2%7D%20%3D%20-0.5295048y_%7B1%7D%20%2B%20-0.684079y_%7B2%7D%20%2B%20-0.1974475y_%7B3%7D%20%2B%200.4258696y_%7B4%7D%20%2B%200.1769468y_%7B5%7D%0A "
+z_{2} = -0.5295048y_{1} + -0.684079y_{2} + -0.1974475y_{3} + 0.4258696y_{4} + 0.1769468y_{5}
+")
 
-![z\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B3%7D "z_{3}")
-=
-0.4181274![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
--0.1558701![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--0.7620396![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
--0.2490388![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
-0.39768![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{3} = 0.4181274y\_{1} + -0.1558701y\_{2} + -0.7620396y\_{3} + -0.2490388y\_{4} + 0.39768y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B3%7D%20%3D%200.4181274y_%7B1%7D%20%2B%20-0.1558701y_%7B2%7D%20%2B%20-0.7620396y_%7B3%7D%20%2B%20-0.2490388y_%7B4%7D%20%2B%200.39768y_%7B5%7D%0A "
+z_{3} = 0.4181274y_{1} + -0.1558701y_{2} + -0.7620396y_{3} + -0.2490388y_{4} + 0.39768y_{5}
+")
 
-![z\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B4%7D "z_{4}")
-=
--0.399324![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
-0.7012017![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--0.4356454![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
-0.3857172![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
-0.101449![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{4} = -0.399324y\_{1} + 0.7012017y\_{2} + -0.4356454y\_{3} + 0.3857172y\_{4} + 0.101449y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B4%7D%20%3D%20-0.399324y_%7B1%7D%20%2B%200.7012017y_%7B2%7D%20%2B%20-0.4356454y_%7B3%7D%20%2B%200.3857172y_%7B4%7D%20%2B%200.101449y_%7B5%7D%0A "
+z_{4} = -0.399324y_{1} + 0.7012017y_{2} + -0.4356454y_{3} + 0.3857172y_{4} + 0.101449y_{5}
+")
 
-![z\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;z_%7B5%7D "z_{5}")
-=
-0.4611605![y\_{1}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B1%7D "y_{1}")
-+
--0.1032041![y\_{2}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B2%7D "y_{2}")
-+
--0.2409541![y\_{3}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B3%7D "y_{3}")
-+
-0.5602327![y\_{4}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B4%7D "y_{4}")
-+
--0.6362078![y\_{5}](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;y_%7B5%7D "y_{5}")
+![
+z\_{5} = 0.4611605y\_{1} + -0.1032041y\_{2} + -0.2409541y\_{3} + 0.5602327y\_{4} + -0.6362078y\_{5}
+](https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&space;%5Cbg_white&space;%0Az_%7B5%7D%20%3D%200.4611605y_%7B1%7D%20%2B%20-0.1032041y_%7B2%7D%20%2B%20-0.2409541y_%7B3%7D%20%2B%200.5602327y_%7B4%7D%20%2B%20-0.6362078y_%7B5%7D%0A "
+z_{5} = 0.4611605y_{1} + -0.1032041y_{2} + -0.2409541y_{3} + 0.5602327y_{4} + -0.6362078y_{5}
+")
 
 ## Use both S and R. Which do you think is more appropriate here?
 
