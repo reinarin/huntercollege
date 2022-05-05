@@ -48,4 +48,4 @@ STAT 717 (Multivariate Analysis) presents the concepts and methods of multivaria
 
 For my project, I decided to choose a dataset on eating habits, physical conditions, and obesity levels. I performed multivariate analysis techniques, learned in class, to determine important contributors to obesity levels, and presented my key findings to the class.
 
-[View my data analysis and visualization project](https://github.com/reinarin/huntercollege/blob/main/stat71700/eating_habits_and_physical_conditions_obesity_levels.md)
+[View my data analysis and visualization project](https://github.com/reinarin/huntercollege/blob/main/stat71700/Final_Project/eating_habits_and_physical_conditions_obesity_levels.md)
