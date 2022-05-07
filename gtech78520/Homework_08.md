@@ -246,7 +246,7 @@ ggplot(data = subset(df, !is.na(life_expectancy_years)),
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, colour = 'gray50'))
 ```
 
-![](Homework_8_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](Homework_08_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 # Create data visualizations ---------------------------------------------------
@@ -261,7 +261,7 @@ ggplot(data = subset(df, !is.na(life_expectancy_years)),
   theme(legend.position = "none")
 ```
 
-![](Homework_8_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](Homework_08_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 # Create data visualizations ---------------------------------------------------
@@ -280,7 +280,7 @@ ggplot(data = subset(df, !is.na(cumulative_deaths)),
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, colour = 'gray50'))
 ```
 
-![](Homework_8_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](Homework_08_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 # Create data visualizations ---------------------------------------------------
@@ -295,7 +295,7 @@ ggplot(data = subset(df, !is.na(cumulative_deaths)),
   theme(legend.position = "none")
 ```
 
-![](Homework_8_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](Homework_08_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 # Create data visualizations ---------------------------------------------------
@@ -311,7 +311,7 @@ ggplot(data = subset(df, !is.na(life_expectancy_years)),
     theme(legend.position = "bottom")
 ```
 
-![](Homework_8_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](Homework_08_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 

@@ -163,7 +163,7 @@ geometry locations.
 plot(postal_areas_sf['ZIPCODE'], main = "NYC Postal Codes")
 ```
 
-![](Homework_9_files/figure-gfm/R-spatial-assignment-task%205a-1.png)<!-- -->
+![](Homework_09_files/figure-gfm/R-spatial-assignment-task%205a-1.png)<!-- -->
 
 ``` r
 # Verify NYC public health services dataset
@@ -175,7 +175,7 @@ ggmap(baseMap) +
              data = public_health_services_sf %>% st_coordinates() %>% tibble::as_tibble())
 ```
 
-![](Homework_9_files/figure-gfm/R-spatial-assignment-task%205a-2.png)<!-- -->
+![](Homework_09_files/figure-gfm/R-spatial-assignment-task%205a-2.png)<!-- -->
 
 ``` r
 # Verify NYS retail food stores dataset
@@ -187,7 +187,7 @@ ggmap(baseMap1) +
              data = retail_food_stores_sf %>% st_coordinates() %>% tibble::as_tibble())
 ```
 
-![](Homework_9_files/figure-gfm/R-spatial-assignment-task%205a-3.png)<!-- -->
+![](Homework_09_files/figure-gfm/R-spatial-assignment-task%205a-3.png)<!-- -->
 
 ### Task 6
 
