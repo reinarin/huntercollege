@@ -1,0 +1,383 @@
+---
+title: "GTECH78520_22S_12_Reina.Li326"
+author: "Reina Li"
+date: "5/7/2022"
+output: html_document
+---
+
+----------
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load_packages, include=FALSE}
+require(tidyverse)
+require(sf)
+require(mapview)
+require(magrittr)
+require(stringr)
+require(ggmap)
+require(lwgeom)
+```
+
+## R Spatial Lab Assignment # 2
+
+The second lab is to aggregate data from different sources to the zip codes as the core covid-19 data are available at that scale.
+
+Main tasks for the second lab are:
+
+1. [Join the COVID-19 data to the NYC zip code area data (*sf* or *sp* polygons).](#task-1)
+2. [Aggregate the NYC food retails store data (points) to the zip code data, so that we know how many retail stores in each zip code area. Note that not all locations are for food retail. And we need to choose the specific types according to the data.](#task-2)
+3. [Aggregate the NYC health facilities (points) to the zip code data. Similarly, choose appropriate subtypes such as nursing homes from the facilities.](#task-3)
+4. [Join the Census ACS population, race, and age data to the NYC Planning Census Tract Data.](#task-4)
+5. [Aggregate the ACS census data to zip code area data.](#task-5)
+
+In the end, we should have the confirmed and tested cases of covid-19, numbers of specific types of food stores, numbers of specific types of health facilities, and population (total population, elderly, by race, etc.) at the zip code level. We should also have boroughs, names, etc. for each zip code area.
+
+----------
+
+## Task 1
+
+Join the COVID-19 data to the NYC zip code area data (*sf* or *sp* polygons).
+
+```{r load_data, echo = TRUE, message = FALSE, results = FALSE}
+# Load the data from lab assignment #1
+# NYC postal areas, public health services, and retail food stores sf files
+load(file = "covid19.RData")
+
+# Remove unused sf files
+rm('public_health_services_sf', 'retail_food_stores_sf')
+
+# Assign the WGS84 project, EPSG code 4326
+postal_areas_sf <- st_transform(postal_areas_sf, 4326)
+
+# Load the COVID-19 data into a dataframe in R
+covid19_df <- read.csv("tests-by-zcta_2021_04_23.csv")
+
+# Load the NYC Food Store in shapefiles into sf objects
+nycFoodStore_sf <- st_read("nycFoodStore.shp")
+
+# Assign the WGS84 project, EPSG code 4326
+nycFoodStore_sf <- st_transform(nycFoodStore_sf, 4326)
+
+# Rename first column of NYC Food Store
+colnames(nycFoodStore_sf) <- c("Cnty", "Lcns_Nm", "Oprtn_T", "Estbl_T", "Entty_N", "DBA_Nam", "Strt_Nmb", "Stret_Nm", "Add_L_2", "Add_L_3", "City", "State", "Zip_Cod", "Sqr_Ftg", "Locatin", "Coords", "geometry")
+
+# Load the NYS Health Facility data into a dataframe in R
+nysHealthFacility_df <- read.csv("NYS_Health_Facility.csv")
+
+# Load the Census Tract/NYC Boroughs in shapefiles into sf objects
+nycBoroughs_sf <- st_read("geo_export_1dc7b645-647b-4806-b9a0-7b79660f120a.shp", stringsAsFactors = FALSE)
+
+# Assign the WGS84 project, EPSG code 4326
+nycBoroughs_sf <- st_transform(nycBoroughs_sf, 4326)
+
+# Load the ACS census data into a dataframe in R
+acsCensus_df <- readLines("ACSDP5Y2018.DP05_data_with_overlays_2020-04-22T132935.csv") %>%
+  extract(-2) %>% 
+  textConnection() %>%
+  read.csv(header = TRUE, quote= "\"") %>%
+  rename(total_population = DP05_0001E, male_population = DP05_0002E, female_population = DP05_0003E,
+         age_under_5 = DP05_0005E, age_5_to_9 = DP05_0006E, age_10_to_14 = DP05_0007E, age_15_to_19 = DP05_0008E, age_20_to_24 = DP05_0009E, age_25_to_34 = DP05_0010E, age_35_to_44 = DP05_0011E, age_45_to_54 = DP05_0012E, age_55_to_59 = DP05_0013E, age_60_to_64 = DP05_0014E, age_65_and_older = DP05_0029E,
+         race_one_white = DP05_0037E, race_one_black = DP05_0038E, race_one_aian = DP05_0039E, race_one_asian = DP05_0044E, race_one_nhpi = DP05_0052E, race_two_or_more = DP05_0058E, race_hispanic_or_latino = DP05_0070E) %>%
+  select(GEO_ID,
+         total_population, male_population, female_population,
+         age_under_5, age_5_to_9, age_10_to_14, age_15_to_19, age_20_to_24, age_25_to_34, age_35_to_44, age_45_to_54, age_55_to_59, age_60_to_64, age_65_and_older,
+         race_one_white, race_one_black, race_one_aian, race_one_asian, race_one_nhpi, race_two_or_more, race_hispanic_or_latino) %>%
+  mutate(census_code = str_sub(GEO_ID, -9,-1))
+```
+
+```{r R-spatial-assignment-task 1a, echo = TRUE, message = FALSE, results = FALSE}
+# Join the COVID-19 data (data.frame) to the NYC zip code area data (sf)
+covid_postal_sf <- merge(postal_areas_sf, covid19_df, by.x = "ZIPCODE", by.y = "MODIFIED_ZCTA", all.x = TRUE)
+
+covid_postal_sf <- covid_postal_sf %>%
+  select(-c(BLDGZIP, PO_NAME, POPULATION, AREA, STATE, COUNTY, ST_FIPS, CTY_FIPS, URL, SHAPE_AREA, SHAPE_LEN, COVID_CASE_RATE, POP_DENOMINATOR, COVID_DEATH_COUNT, COVID_DEATH_RATE, PERCENT_POSITIVE, label, lat, lon))
+```
+
+```{r R-spatial-assignment-task 1b, echo = TRUE, message = FALSE}
+# Confirmed cases and total tests of COVID-19 by zip code level
+# Verify with a map
+mapview(covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests", legend = FALSE)
+```
+
+----------
+
+## Task 2
+
+Aggregate the NYC food retails store data (points) to the zip code data, so that we know how many retail stores in each zip code area. Note that not all locations are for food retail. And we need to choose the specific types according to the data.
+
+```{r R-spatial-assignment-task 2a, echo = TRUE, message = FALSE, results = FALSE}
+# Count amount of Store for each zip code
+A_count_sf <- postal_areas_sf %>%
+  mutate(tract_area = st_area(geometry)) %>%
+  st_join(nycFoodStore_sf) %>%
+  filter(str_detect(Estbl_T, '[A]')) %>%
+  group_by(ZIPCODE) %>%
+  summarize(Store_Count = n())
+
+# Convert into data frame
+A_count_df <- st_drop_geometry(A_count_sf)
+
+# Count amount of Bakery for each zip code
+B_count_sf <- postal_areas_sf %>%
+  mutate(tract_area = st_area(geometry)) %>%
+  st_join(nycFoodStore_sf) %>%
+  filter(str_detect(Estbl_T, '[B]')) %>%
+  group_by(ZIPCODE) %>%
+  summarize(Bakery_Count = n())
+
+# Convert into data frame
+B_count_df <- st_drop_geometry(B_count_sf)
+
+# Join A and B
+retailfoodstores_count <- A_count_df %>%
+  left_join(B_count_df, by = "ZIPCODE")
+
+# Join the COVID-19 & zip code data to the retail food stores data
+foodstores_covid_postal_sf <- merge(covid_postal_sf, retailfoodstores_count, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+```
+
+```{r R-spatial-assignment-task 2b, echo = TRUE, message = FALSE}
+# Confirmed cases and total tests of COVID-19, retail food stores by zip code level
+# Verify with a map
+mapview(foodstores_covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores", legend = FALSE)
+```
+
+----------
+
+## Task 3
+
+Aggregate the NYC health facilities (points) to the zip code data. Similarly, choose appropriate subtypes such as nursing homes from the facilities.
+
+```{r R-spatial-assignment-task 3a, echo = TRUE, message = FALSE, results = FALSE}
+# Remove NA values
+nysHealthFacility_df <- nysHealthFacility_df %>%
+  select(c(Short.Description, Description, Facility.Zip.Code, Facility.Latitude, Facility.Longitude))
+nysHealthFacility_df <- na.omit(nysHealthFacility_df)
+
+# Create sf object from health facilities geographic coordinates
+public_health_services_sf <- st_as_sf(nysHealthFacility_df, coords = c("Facility.Longitude", "Facility.Latitude"), crs = 4326)
+
+# Count amount of Hospitals for each zip code
+HOSP_count_sf <- postal_areas_sf %>%
+  mutate(tract_area = st_area(geometry)) %>%
+  st_join(public_health_services_sf) %>%
+  filter(str_detect(Short.Description, '^HOSP')) %>%
+  group_by(ZIPCODE) %>%
+  summarize(Hospital_Count = n())
+
+# Convert into data frame
+HOSP_count_df <- st_drop_geometry(HOSP_count_sf)
+
+# Count amount of Nursing Homes for each zip code
+NH_count_sf <- postal_areas_sf %>%
+  mutate(tract_area = st_area(geometry)) %>%
+  st_join(public_health_services_sf) %>%
+  filter(str_detect(Short.Description, '^NH')) %>%
+  group_by(ZIPCODE) %>%
+  summarize(NursingHome_Count = n())
+
+# Convert into data frame
+NH_count_df <- st_drop_geometry(NH_count_sf)
+
+# Count amount of Diagnostic and Treatment Centers for each zip code
+DTC_count_sf <- postal_areas_sf %>%
+  mutate(tract_area = st_area(geometry)) %>%
+  st_join(public_health_services_sf) %>%
+  filter(str_detect(Short.Description, '^DTC')) %>%
+  group_by(ZIPCODE) %>%
+  summarize(DiagnosticAndTreatmentCenter_Count = n())
+
+# Convert into data frame
+DTC_count_df <- st_drop_geometry(DTC_count_sf)
+
+# Join them into one data frame
+healthfacility_count <- HOSP_count_df %>%
+  left_join(NH_count_df, by = "ZIPCODE") %>%
+  left_join(DTC_count_df, by = "ZIPCODE")
+
+# Join with retail food stores data
+task3_merged <- retailfoodstores_count %>%
+  left_join(healthfacility_count, by = "ZIPCODE")
+
+# Join the COVID-19 & zip code data to the health facility data
+health_food_covid_postal_sf <- merge(covid_postal_sf, task3_merged, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+```
+
+```{r R-spatial-assignment-task 3b, echo = TRUE, message = FALSE}
+# Confirmed cases and total tests of COVID-19, retail food stores, health facilities by zip code level
+# Verify with a map
+mapview(health_food_covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities", legend = FALSE)
+```
+
+----------
+
+## Task 4
+
+Join the Census ACS population, race, and age data to the NYC Planning Census Tract Data.
+
+```{r R-spatial-assignment-task 4a, echo = TRUE, message = FALSE, results = FALSE}
+# Add column censusCode so it can be joined with acsCensus data
+nycBoroughs_censuscode_sf <- nycBoroughs_sf %>%
+  mutate(CTY_FIPS = case_when(
+    boro_name == "Bronx" ~ '005',
+    boro_name == "Brooklyn" ~ '047',
+    boro_name == "Manhattan" ~ '061',
+    boro_name == "Queens" ~ '081',
+    boro_name == "Staten Island" ~ '085'),
+    censusCode = paste(CTY_FIPS, ct2010, sep = '')) %>%
+  select(-c(boro_code, boro_ct201, cdeligibil, ct2010, ctlabel, ntacode, ntaname, puma, shape_area, shape_leng, CTY_FIPS))
+
+# Join with acsCensus data
+boro_pop_age_race_sf <- merge(nycBoroughs_censuscode_sf, acsCensus_df, by.x = "censusCode", by.y = "census_code")
+```
+
+```{r R-spatial-assignment-task 4b, echo = TRUE, message = FALSE}
+# Total Population, Total population by Gender, Total Population by Age, Total Population by Race by borough level
+# Verify with a map
+mapview(boro_pop_age_race_sf, zcol = "censusCode", layer.name = "Population, Age, and Race", legend = FALSE)
+```
+
+----------
+
+## Task 5
+
+Aggregate the ACS census data to zip code area data.
+
+```{r R-spatial-assignment-task 5a, echo = TRUE, message = FALSE, results = FALSE}
+census_data_sf <- st_transform(boro_pop_age_race_sf, st_crs(postal_areas_sf))
+
+census_sf <- postal_areas_sf %>%
+  mutate(tract_area = st_area(geometry)) %>%
+  st_join(census_data_sf, join = st_contains) %>%
+  group_by(ZIPCODE) %>%
+  summarise(total_pop = sum(total_population),
+            male_pop = sum(male_population),
+            female_pop = sum(female_population),
+            age_under_5 = sum(age_under_5),
+            age_5_to_9 = sum(age_5_to_9),
+            age_10_to_14 = sum(age_10_to_14),
+            age_15_to_19 = sum(age_15_to_19),
+            age_20_to_24 = sum(age_20_to_24),
+            age_25_to_34 = sum(age_25_to_34),
+            age_35_to_44 = sum(age_35_to_44),
+            age_45_to_54 = sum(age_45_to_54),
+            age_55_to_59 = sum(age_55_to_59),
+            age_60_to_64 = sum(age_60_to_64),
+            age_65_and_older = sum(age_65_and_older),
+            race_one_white = sum(race_one_white),
+            race_one_black = sum(race_one_black),
+            race_one_aian = sum(race_one_aian),
+            race_one_asian = sum(race_one_asian),
+            race_one_nhpi = sum(race_one_nhpi),
+            race_two_or_more = sum(race_two_or_more),
+            race_hispanic_or_latino = sum(race_hispanic_or_latino))
+
+census_df <- st_drop_geometry(census_sf)
+
+# Join with task 1, 2, 3, 4
+task5_merged <- task3_merged %>%
+  left_join(census_df, by = "ZIPCODE")
+
+# Join the COVID-19 & zip code data to all the data
+final_sf <- merge(covid_postal_sf, task5_merged, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+```
+
+```{r R-spatial-assignment-task 5b, echo = TRUE, message = FALSE}
+# Confirmed cases and total tests of COVID-19, retail food stores, health facilities, population by gender, age, and race by zip code level
+# Verify with a map
+mapview(final_sf, zcol = "ZIPCODE", layer.name = "", legend = FALSE)
+```
+
+----------
+
+#### Map: COVID-19 Case Count and Total Tests (Only) by Zip Code
+
+View (Zip Code Level) Map with:
+
+- Confirmed cases of COVID-19
+- Total tests of COVID-19
+
+```{r R-spatial-assignment-task map1, echo = TRUE, message = FALSE}
+mapview(covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests", legend = FALSE)
+```
+
+----------
+
+#### Map: Retail Food Stores (Only) by Zip Code
+
+View (Zip Code Level) Map with:
+
+- Number of specific retail food stores
+
+```{r R-spatial-assignment-task map2, echo = TRUE, message = FALSE}
+map2_sf <- merge(postal_areas_sf, retailfoodstores_count, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+map2_sf <- map2_sf %>%
+  select(-c(BLDGZIP, PO_NAME, POPULATION, AREA, STATE, COUNTY, ST_FIPS, CTY_FIPS, URL, SHAPE_AREA, SHAPE_LEN))
+mapview(map2_sf, zcol = "ZIPCODE", layer.name = "Retail Food Stores", legend = FALSE)
+```
+
+----------
+
+#### Map: Health Facilities (Only) by Zip Code
+
+View (Zip Code Level) Map with:
+
+- Number of specific health facilities
+
+```{r R-spatial-assignment-task map3, echo = TRUE, message = FALSE}
+map3_sf <- merge(postal_areas_sf, healthfacility_count, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+map3_sf <- map3_sf %>%
+  select(-c(BLDGZIP, PO_NAME, POPULATION, AREA, STATE, COUNTY, ST_FIPS, CTY_FIPS, URL, SHAPE_AREA, SHAPE_LEN))
+mapview(map3_sf, zcol = "ZIPCODE", layer.name = "Health Facilities", legend = FALSE)
+```
+
+----------
+
+#### Map: COVID-19 Case Count and Total Tests, Retail Food Stores by Zip Code
+
+View (Zip Code Level) Map with:
+
+- Confirmed cases of COVID-19
+- Total tests of COVID-19
+- Number of specific retail food stores
+
+```{r R-spatial-assignment-task map4, echo = TRUE, message = FALSE}
+mapview(foodstores_covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores", legend = FALSE)
+```
+
+----------
+
+#### Map: COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities by Zip Code
+
+View (Zip Code Level) Map with:
+
+- Confirmed cases of COVID-19
+- Total tests of COVID-19
+- Number of specific retail food stores
+- Number of specific health facilities
+
+```{r R-spatial-assignment-task map5, echo = TRUE, message = FALSE}
+mapview(health_food_covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities", legend = FALSE)
+```
+
+----------
+
+#### Map: COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities, Population by Gender, Age, and Race by Zip Code
+
+View (Zip Code Level) Map with:
+
+- Confirmed cases of COVID-19
+- Total tests of COVID-19
+- Number of specific retail food stores
+- Number of specific health facilities
+- Population by:
+  - Gender
+  - Age
+  - Race
+
+```{r R-spatial-assignment-task map6, echo = TRUE, message = FALSE}
+mapview(final_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities, Population by Gender, Age, and Race", legend = FALSE)
+```
