@@ -19,15 +19,14 @@
     - A review of multivariate linear model and maximum likelihood estimation. Nonlinear regression models. Logistic and Poisson regression models. Family of generalized linear models. Multidimensional tables. Odds ratio. Model selection and evaluation. Computer-based exploratory data analysis. Examples from the life sciences.
 
 - **Electives**
-  - Twelve credits in statistics, computer science, mathematics, or relevant areas of application, selected to constitute a cohesive program.
-    - **MATH 72500 Advanced Linear Algebra**
-      - Topics in advanced linear algebra and multilinear algebra.
-    - **STAT 72600 Theory and Methods of Sampling**
-      - The techniques of modern sampling with applications to human population studies. Structured sampling designs. Unequal probability sampling. Efficient sampling. Accuracy, precision and the sources of bias. Longitudinal panel study design. The study of available Federal data bases relating to the health and welfare of US residents.
-    - **STAT 71700 Multivariate Analysis**
-      - An introduction to multivariate methods. Topics selected from: factor analysis; discriminant analysis; clustering; multidimensional scaling; MANOVA; canonical correlation; and projection- pursuit.
-    - **GTECH 78520 Data Analysis and Visualization with R**
-      - An introduction to the basics of R and the practical knowledge of data cleaning, re-organization, modeling, statistics, and analysis for research and visualization, particularly in geospatial fields.
+  - **MATH 72500 Advanced Linear Algebra**
+    - Topics in advanced linear algebra and multilinear algebra.
+  - **STAT 72600 Theory and Methods of Sampling**
+    - The techniques of modern sampling with applications to human population studies. Structured sampling designs. Unequal probability sampling. Efficient sampling. Accuracy, precision and the sources of bias. Longitudinal panel study design. The study of available Federal data bases relating to the health and welfare of US residents.
+  - **STAT 71700 Multivariate Analysis**
+    - An introduction to multivariate methods. Topics selected from: factor analysis; discriminant analysis; clustering; multidimensional scaling; MANOVA; canonical correlation; and projection- pursuit.
+  - **GTECH 78520 Data Analysis and Visualization with R**
+    - An introduction to the basics of R and the practical knowledge of data cleaning, re-organization, modeling, statistics, and analysis for research and visualization, particularly in geospatial fields.
 
 - **Project**
   - **STAT 790 Case Seminar**
