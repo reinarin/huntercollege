@@ -19,6 +19,7 @@ require(magrittr)
 require(stringr)
 require(ggmap)
 require(lwgeom)
+require(leafsync)
 ```
 
 ## R Spatial Lab Assignment # 2
@@ -99,7 +100,8 @@ covid_postal_sf <- covid_postal_sf %>%
 ```{r R-spatial-assignment-task 1b, echo = TRUE, message = FALSE}
 # Confirmed cases and total tests of COVID-19 by zip code level
 # Verify with a map
-mapview(covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests", legend = FALSE)
+mapview(covid_postal_sf, zcol = "COVID_CASE_COUNT", layer.name = "COVID-19 Case Count")
+mapview(covid_postal_sf, zcol = "TOTAL_COVID_TESTS", layer.name = "COVID-19 Total Tests")
 ```
 
 ----------
@@ -135,14 +137,17 @@ B_count_df <- st_drop_geometry(B_count_sf)
 retailfoodstores_count <- A_count_df %>%
   left_join(B_count_df, by = "ZIPCODE")
 
-# Join the COVID-19 & zip code data to the retail food stores data
-foodstores_covid_postal_sf <- merge(covid_postal_sf, retailfoodstores_count, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+# Join the zip code data to the retail food stores data
+foodstores_postal_sf <- merge(covid_postal_sf, retailfoodstores_count, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+foodstores_postal_sf <- foodstores_postal_sf %>%
+  select(-c(COVID_CASE_COUNT, TOTAL_COVID_TESTS))
 ```
 
 ```{r R-spatial-assignment-task 2b, echo = TRUE, message = FALSE}
-# Confirmed cases and total tests of COVID-19, retail food stores by zip code level
+# Retail food stores by zip code level
 # Verify with a map
-mapview(foodstores_covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores", legend = FALSE)
+mapview(foodstores_postal_sf, zcol = "Store_Count", layer.name = "Retail Food- Store Count")
+mapview(foodstores_postal_sf, zcol = "Bakery_Count", layer.name = "Retail Food- Bakery Count")
 ```
 
 ----------
@@ -198,18 +203,18 @@ healthfacility_count <- HOSP_count_df %>%
   left_join(NH_count_df, by = "ZIPCODE") %>%
   left_join(DTC_count_df, by = "ZIPCODE")
 
-# Join with retail food stores data
-task3_merged <- retailfoodstores_count %>%
-  left_join(healthfacility_count, by = "ZIPCODE")
-
-# Join the COVID-19 & zip code data to the health facility data
-health_food_covid_postal_sf <- merge(covid_postal_sf, task3_merged, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+# Join the zip code data to the health facility data
+health_postal_sf <- merge(covid_postal_sf, healthfacility_count, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+health_postal_sf <- health_postal_sf %>%
+  select(-c(COVID_CASE_COUNT, TOTAL_COVID_TESTS))
 ```
 
 ```{r R-spatial-assignment-task 3b, echo = TRUE, message = FALSE}
-# Confirmed cases and total tests of COVID-19, retail food stores, health facilities by zip code level
+# Health facilities by zip code level
 # Verify with a map
-mapview(health_food_covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities", legend = FALSE)
+mapview(health_postal_sf, zcol = "Hospital_Count", layer.name = "Health Facilities- Hospital Count")
+mapview(health_postal_sf, zcol = "NursingHome_Count", layer.name = "Health Facilities- Nursing Home Count")
+mapview(health_postal_sf, zcol = "DiagnosticAndTreatmentCenter_Count", layer.name = "Health Facilities- Diagnostic and Treatment Center Count")
 ```
 
 ----------
@@ -234,7 +239,7 @@ nycBoroughs_censuscode_sf <- nycBoroughs_sf %>%
 boro_pop_age_race_sf <- merge(nycBoroughs_censuscode_sf, acsCensus_df, by.x = "censusCode", by.y = "census_code")
 ```
 
-```{r R-spatial-assignment-task 4b, echo = TRUE, message = FALSE}
+```{r R-spatial-assignment-task 4b, include = FALSE, echo = TRUE, message = FALSE}
 # Total Population, Total population by Gender, Total Population by Age, Total Population by Race by borough level
 # Verify with a map
 mapview(boro_pop_age_race_sf, zcol = "censusCode", layer.name = "Population, Age, and Race", legend = FALSE)
@@ -251,7 +256,7 @@ census_data_sf <- st_transform(boro_pop_age_race_sf, st_crs(postal_areas_sf))
 
 census_sf <- postal_areas_sf %>%
   mutate(tract_area = st_area(geometry)) %>%
-  st_join(census_data_sf, join = st_contains) %>%
+  st_join(census_data_sf) %>%
   group_by(ZIPCODE) %>%
   summarise(total_pop = sum(total_population),
             male_pop = sum(male_population),
@@ -277,107 +282,16 @@ census_sf <- postal_areas_sf %>%
 
 census_df <- st_drop_geometry(census_sf)
 
-# Join with task 1, 2, 3, 4
-task5_merged <- task3_merged %>%
-  left_join(census_df, by = "ZIPCODE")
-
 # Join the COVID-19 & zip code data to all the data
-final_sf <- merge(covid_postal_sf, task5_merged, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+census_postal_sf <- merge(covid_postal_sf, census_df, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
+census_postal_sf <- census_postal_sf %>%
+  select(-c(COVID_CASE_COUNT, TOTAL_COVID_TESTS))
 ```
 
 ```{r R-spatial-assignment-task 5b, echo = TRUE, message = FALSE}
-# Confirmed cases and total tests of COVID-19, retail food stores, health facilities, population by gender, age, and race by zip code level
+# Population by gender, age, and race by zip code level
 # Verify with a map
-mapview(final_sf, zcol = "ZIPCODE", layer.name = "", legend = FALSE)
-```
-
-----------
-
-#### Map: COVID-19 Case Count and Total Tests (Only) by Zip Code
-
-View (Zip Code Level) Map with:
-
-- Confirmed cases of COVID-19
-- Total tests of COVID-19
-
-```{r R-spatial-assignment-task map1, echo = TRUE, message = FALSE}
-mapview(covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests", legend = FALSE)
-```
-
-----------
-
-#### Map: Retail Food Stores (Only) by Zip Code
-
-View (Zip Code Level) Map with:
-
-- Number of specific retail food stores
-
-```{r R-spatial-assignment-task map2, echo = TRUE, message = FALSE}
-map2_sf <- merge(postal_areas_sf, retailfoodstores_count, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
-map2_sf <- map2_sf %>%
-  select(-c(BLDGZIP, PO_NAME, POPULATION, AREA, STATE, COUNTY, ST_FIPS, CTY_FIPS, URL, SHAPE_AREA, SHAPE_LEN))
-mapview(map2_sf, zcol = "ZIPCODE", layer.name = "Retail Food Stores", legend = FALSE)
-```
-
-----------
-
-#### Map: Health Facilities (Only) by Zip Code
-
-View (Zip Code Level) Map with:
-
-- Number of specific health facilities
-
-```{r R-spatial-assignment-task map3, echo = TRUE, message = FALSE}
-map3_sf <- merge(postal_areas_sf, healthfacility_count, by.x = "ZIPCODE", by.y = "ZIPCODE", all.x = TRUE)
-map3_sf <- map3_sf %>%
-  select(-c(BLDGZIP, PO_NAME, POPULATION, AREA, STATE, COUNTY, ST_FIPS, CTY_FIPS, URL, SHAPE_AREA, SHAPE_LEN))
-mapview(map3_sf, zcol = "ZIPCODE", layer.name = "Health Facilities", legend = FALSE)
-```
-
-----------
-
-#### Map: COVID-19 Case Count and Total Tests, Retail Food Stores by Zip Code
-
-View (Zip Code Level) Map with:
-
-- Confirmed cases of COVID-19
-- Total tests of COVID-19
-- Number of specific retail food stores
-
-```{r R-spatial-assignment-task map4, echo = TRUE, message = FALSE}
-mapview(foodstores_covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores", legend = FALSE)
-```
-
-----------
-
-#### Map: COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities by Zip Code
-
-View (Zip Code Level) Map with:
-
-- Confirmed cases of COVID-19
-- Total tests of COVID-19
-- Number of specific retail food stores
-- Number of specific health facilities
-
-```{r R-spatial-assignment-task map5, echo = TRUE, message = FALSE}
-mapview(health_food_covid_postal_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities", legend = FALSE)
-```
-
-----------
-
-#### Map: COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities, Population by Gender, Age, and Race by Zip Code
-
-View (Zip Code Level) Map with:
-
-- Confirmed cases of COVID-19
-- Total tests of COVID-19
-- Number of specific retail food stores
-- Number of specific health facilities
-- Population by:
-  - Gender
-  - Age
-  - Race
-
-```{r R-spatial-assignment-task map6, echo = TRUE, message = FALSE}
-mapview(final_sf, zcol = "ZIPCODE", layer.name = "COVID-19 Case Count and Total Tests, Retail Food Stores, Health Facilities, Population by Gender, Age, and Race", legend = FALSE)
+mapview(census_postal_sf, zcol = c("total_pop"), layer.name = "Total Population")
+mapview(census_postal_sf, zcol = c("age_65_and_older"), layer.name = "Age 65 and older Population")
+mapview(census_postal_sf, zcol = c("race_one_asian"), layer.name = "Asian Population")
 ```
