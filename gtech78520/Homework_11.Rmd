@@ -1,0 +1,173 @@
+---
+title: "GTECH78520_22S_13_Reina.Li326"
+author: "Reina Li"
+date: "5/14/2022"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load_packages, include = FALSE}
+require(tidyverse);
+require(sf); 
+require(mapview); 
+require(magrittr);
+require(ggmap);
+require(classInt);
+require(RColorBrewer);
+pal <- brewer.pal(7, "OrRd")
+require(ggrepel);
+require(ggpubr);
+require(tmap);
+```
+
+## R Spatial Lab Assignment # 3
+
+The third and last R-spatial lab is to visualize data that we assembled during the first two labs. As geovisualization is often exploratory, you are encouraged to be more creative.
+
+Main tasks for the third lab are:
+
+1. [Plot at least two high-quality static maps with one using the COVID-19 data and one using a related factor. You can use either `plot` method for *sf* or `ggplot` method.](#task-1)
+2. [Use *ggplot2* and other ggplot-compatible packages to create a multi-map figure illustrating the possible relationship between COVID-19 confirmed cases or rate and another factor (e.g., the number of nursing homes, number of food stores, neighborhood racial composition, elderly population, etc.). The maps should be put side by side on one single page. Add graticule to at least one of those maps and label some of the feature on the map where applicable and appropriate.](#task-2)
+3. [Create a web-based interactive map for COVID-19 data using *tmap* or *leaflet* package and save it as a HTML file.](#task-3)
+
+Although data visualization has many subjective factors, try your best to make the visuals as appealing as possible.
+
+----------
+
+## Task 1
+
+Plot at least two high-quality static maps with one using the COVID-19 data and one using a related factor. You can use either `plot` method for *sf* or `ggplot` method.
+
+```{r load_data, echo = TRUE, message = FALSE, results = FALSE, warning = FALSE}
+# Load the Population by Zip shapefiles into sf objects
+popByZip_sf <- st_read("acsPopByZip.shp")
+```
+
+```{r R-spatial-assignment-task 1a, echo = TRUE, message = FALSE, warning = FALSE}
+# Get basemap
+mapBound <- popByZip_sf %>%
+  st_transform(4326) %>%
+  st_bbox() %>%
+  st_as_sfc() %>%
+  st_buffer(0.02) %>%
+  st_bbox() %>%
+  as.numeric()
+
+nyc_basemap <- get_stamenmap(bbox = mapBound, zoom =11, messaging = FALSE, maptype = 'terrain-background')
+```
+
+```{r R-spatial-assignment-task 1b, echo = TRUE, message = FALSE, warning = FALSE}
+# Map 1 using the COVID-19 data
+ggmap(nyc_basemap) +
+  geom_sf(data = popByZip_sf, aes(fill = Positiv), inherit.aes = FALSE) +
+  labs(title = "NYC COVID-19 Confirmed Cases by Zip Code Level",
+       x = "Longitude",
+       y = "Latitude",
+       fill = "Positive Test Count") +
+  coord_sf(crs = st_crs(4326))
+```
+
+```{r R-spatial-assignment-task 1c, echo = TRUE, message = FALSE, warning = FALSE}
+# Map 2 using the Asian Population data
+ggmap(nyc_basemap) +
+  geom_sf(data = popByZip_sf, aes(fill = asianPp), inherit.aes = FALSE) +
+  labs(title = "NYC Asian Population by Zip Code Level",
+       x = "Longitude",
+       y = "Latitude",
+       fill = "Asian Population Count") +
+  coord_sf(crs = st_crs(4326))
+```
+
+## Task 2
+
+Use *ggplot2* and other ggplot-compatible packages to create a multi-map figure illustrating the possible relationship between COVID-19 confirmed cases or rate and another factor (e.g., the number of nursing homes, number of food stores, neighborhood racial composition, elderly population, etc.). The maps should be put side by side on one single page. Add graticule to at least one of those maps and label some of the feature on the map where applicable and appropriate.
+
+```{r R-spatial-assignment-task 2a, echo = TRUE, message = FALSE, warning = FALSE}
+# Determine the breaks
+breaks_qt_g1 <- classIntervals(c(min(popByZip_sf$Positiv) - 0.00001,
+                                 popByZip_sf$Positiv), n = 7, style = "quantile")
+
+breaks_qt_g2 <- classIntervals(c(min(popByZip_sf$eldrlyP) - 0.00001,
+                                 popByZip_sf$eldrlyP), n = 7, style = "quantile")
+
+# Retrieve the breaks
+covid_confirmed_sf <- mutate(popByZip_sf, positive_cat = cut(Positiv, breaks_qt_g1$brks))
+
+elderly_sf <- mutate(popByZip_sf, elderly_cat = cut(eldrlyP, breaks_qt_g2$brks))
+
+
+```
+
+```{r R-spatial-assignment-task 2b, echo = TRUE, message = FALSE, warning = FALSE}
+# Disperse labels
+labelCoords_g1 <- covid_confirmed_sf %>%
+  st_centroid() %>%
+  filter(Positiv > 1900) %>%
+  st_coordinates();
+
+labelData_g1 <- covid_confirmed_sf %>%
+  st_centroid() %>%
+  filter(Positiv > 1900) %>%
+  mutate(x = labelCoords_g1[,1], y = labelCoords_g1[,2])
+
+labelCoords_g2 <- elderly_sf %>%
+  st_centroid() %>%
+  filter(eldrlyP > 14000) %>%
+  st_coordinates();
+
+labelData_g2 <- elderly_sf %>%
+  st_centroid() %>%
+  filter(eldrlyP > 14000) %>%
+  mutate(x = labelCoords_g2[,1], y = labelCoords_g2[,2])
+```
+
+```{r R-spatial-assignment-task 2c, fig.width = 15, fig.height = 8, echo = TRUE, message = FALSE, warning = FALSE}
+g1 <- ggplot(covid_confirmed_sf) +
+  geom_sf(aes(fill = positive_cat)) +
+  scale_fill_brewer(palette = "OrRd", name = "Positive Cases") +
+  geom_label_repel(data = labelData_g1,
+                   aes(x = x, y = y, label = Positiv),
+                   label.size = 0.09,
+                   size = 3,) +
+  labs(x = "Longitude",
+       y = "Latitude")
+
+g2 <- ggplot(elderly_sf) +
+  geom_sf(aes(fill = elderly_cat)) +
+  scale_fill_brewer(palette = "OrRd", name = "Elderly Pop.") +
+  geom_label_repel(data = labelData_g2,
+                   aes(x = x, y = y, label = eldrlyP),
+                   label.size = 0.09,
+                   size = 3) +
+  labs(x = "Longitude",
+       y = "Latitude")
+
+ggarrange(g1, g2, nrow = 1, ncol = 2)
+```
+
+## Task 3
+
+Create a web-based interactive map for COVID-19 data using *tmap* or *leaflet* package and save it as a HTML file.
+
+```{r R-spatial-assignment-task 3a, echo = TRUE, message = FALSE, warning = FALSE}
+# Static map
+tm_shape(popByZip_sf) +
+  tm_polygons("Positiv",
+              style = "quantile",
+              title = "NYC COVID-19 Confirmed Cases")
+```
+
+```{r R-spatial-assignment-task 3b, echo = TRUE, message = FALSE, warning = FALSE}
+# Interactive map
+tmap_mode("view")
+g3 <- tmap_last()
+tmap_last()
+```
+
+```{r R-spatial-assignment-task 3c, echo = TRUE, message = FALSE, warning = FALSE}
+# Save interactive plot as HTML file
+tmap_save(g3, "COVID19_Confirmed.html")
+```
