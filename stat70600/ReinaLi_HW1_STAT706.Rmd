@@ -1,0 +1,389 @@
+---
+title: "Fall 2022 STAT 706 HW 1"
+author: "Reina Li"
+output:
+  pdf_document: default
+---
+
+# Chapter 2.8 : 1a-d, 2a-b, 3a-c, 4a-b, 5, 6a-c
+
+## 1.
+
+```{r q1_setup, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Import data set-----
+df_1a <- read.csv("playbill.csv")
+
+# Fit the model to the data-----
+model_1a <- lm(CurrentWeek ~ LastWeek,
+               data = df_1a)
+summary(model_1a)
+```
+
+### (a)
+
+```{r q1a, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+alpha <- 0.05
+
+# method 1
+n <- dim(df_1a)[1]
+xbar <- mean(df_1a$LastWeek)
+ybar <- mean(df_1a$CurrentWeek)
+
+sxy <- 0
+for (i in 1:n){
+  a <- df_1a$LastWeek[i]-xbar
+  b <- df_1a$CurrentWeek[i]-ybar
+  sxy <- sxy + (a*b)
+}
+
+sxx <- 0
+for (i in 1:n) {
+  a <- df_1a$LastWeek[i]-xbar
+  sxx <- sxx + (a^2)
+}
+
+bhat_1 <- sxy/sxx
+
+s_squared <- 0
+for (i in 1:n) {
+  s_squared <- s_squared + (model_1a$residuals[i])^2
+}
+s_squared <- (1 / (n - 2)) * s_squared
+s <- sqrt(s_squared)
+
+#same as summary(model_1a)$coefficients[2,2]
+standarderr <- s/sqrt(sxx)
+
+tval <- qt(p = alpha/2, df = n - 2, lower.tail = FALSE)
+
+lowerconf <- bhat_1 - tval * standarderr
+lowerconf
+upperconf <- bhat_1 + tval * standarderr
+upperconf
+
+# method 2
+confint(model_1a, level = 0.95)[2,]
+```
+
+Two methods were used to compute the confidence interval for $\beta_{1}$. Method 1 uses the formulas found in the textbook, while method 2 uses a built-in R function. They return the same values for the confidence interval. The confidence interval is (`r confint(model_1a, level = 0.95)[2,][1]`, `r confint(model_1a, level = 0.95)[2,][2]`).
+
+1 is a plausible value for $\beta_{1}$ because 1 is within the 95% confidence interval.
+
+-----
+
+### (b)
+
+```{r q1b, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# H0 : beta_0 = 10000 against HA : beta_0 != 10000
+
+h_0 <- 10000
+h_obs <- summary(model_1a)$coefficients[1,1]
+h_obs_standarderr <- summary(model_1a)$coefficients[1,2]
+
+test_stat <- (h_obs - h_0) / h_obs_standarderr
+p_val <- 2 * pt(q = test_stat, df = n - 2, lower.tail = FALSE)
+p_val
+p_val < alpha
+```
+
+Since the p-value, `r p_val`, is not less than 0.05, we fail to reject the null hypothesis.
+
+-----
+
+### (c)
+
+```{r q1c, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+predict(model_1a, data.frame(LastWeek = 400000), interval = "prediction", level = 0.95)
+```
+
+Using the `predict()` function, a 95% prediction interval was calculated for the gross box office results for the current week for a production with \$400,000 in gross box office the previous week. The prediction interval is (`r predict(model_1a, data.frame(LastWeek = 400000), interval = "prediction")[2]`, `r predict(model_1a, data.frame(LastWeek = 400000), interval = "prediction")[3]`). Since \$450,000 is greater than the upper bound of the prediction interval, \$450,000 is not a feasible value for the gross box office results in the week.
+
+-----
+
+### (d)
+
+```{r q1d, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+plot(df_1a$LastWeek, df_1a$CurrentWeek)
+abline(model_1a, col = "blue")
+summary(model_1a)$r.squared
+plot(model_1a)
+```
+
+First, looking at the first plot of the data with a regression line (blue line), there is evidence that we should be doing a simple linear regression on the model. The $R^2$ value, `r summary(model_1a)$r.squared`, is also very close to 1, which means that the model explains almost all the variation in the response variable around its mean. When we look at the Residuals vs Fitted plot, we can see that only 3 values were not predicted well, because they are far away from the line at $x=0$. Given all this information from the plots, this prediction rule is appropriate.
+
+-----
+
+## 2. 
+
+```{r q2_setup, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Import data set-----
+df_2a <- read.table("indicators.txt", header = TRUE, sep = "", dec = ".")
+
+# Fit the model to the data-----
+model_2a <- lm(PriceChange ~ LoanPaymentsOverdue,
+               data = df_2a)
+summary(model_2a)
+```
+
+### (a)
+
+```{r q2a, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+confint(model_2a, level = 0.95)[2,]
+```
+
+The confidence interval for $\beta_{1}$ is (`r confint(model_2a, level = 0.95)[2,][1]`, `r confint(model_2a, level = 0.95)[2,][2]`).
+
+On the basis of this confidence interval, there is evidence of a significant negative linear association.
+
+-----
+
+### (b)
+
+```{r q2b, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+predict(model_2a, data.frame(LoanPaymentsOverdue = 4), interval = "confidence", level = 0.95)
+```
+
+The confidence interval for E($Y|X=4$) is (`r predict(model_2a, data.frame(LoanPaymentsOverdue = 4), interval = "confidence", level = 0.95)[2]`, `r predict(model_2a, data.frame(LoanPaymentsOverdue = 4), interval = "confidence", level = 0.95)[3]`).
+
+$0%$ is not a feasible value for E($Y|X=4$) because 0 is greater than the upper bound of the confidence interval, so it is outside of the interval.
+
+-----
+
+## 3.
+
+```{r q3_setup, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Import data set-----
+df_3a <- read.table("invoices.txt", header = TRUE, sep = "", dec = ".")
+
+# Fit the model to the data-----
+model_3a <- lm(Time ~ Invoices,
+               data = df_3a)
+summary(model_3a)
+```
+
+### (a)
+
+```{r q3a, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+bhat_0 <- summary(model_3a)$coefficients[1,1]
+standarderr <- summary(model_3a)$coefficients[1,2]
+lowerconf <- bhat_0 - 1.96 * standarderr
+lowerconf
+upperconf <- bhat_0 + 1.96 * standarderr
+upperconf
+```
+
+The confidence interval for the start-up time, $\beta_{0}$ is (`r lowerconf`, `r upperconf`).
+
+-----
+
+### (b)
+
+```{r q3b, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# H0 : beta_1 = 0.01 against HA : beta_1 != 0.01
+
+h_0 <- 0.01
+h_obs <- summary(model_3a)$coefficients[2,1]
+h_obs_standarderr <- summary(model_3a)$coefficients[2,2]
+
+test_stat <- (h_obs - h_0) / h_obs_standarderr
+p_val <- 2 * pt(q = test_stat, df = n - 2, lower.tail = FALSE)
+p_val
+p_val < alpha
+```
+
+Since the p-value, `r p_val`, is not less than 0.05, we fail to reject the null hypothesis.
+
+-----
+
+### (c)
+
+```{r q3c, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+
+n <- dim(df_3a)[1]
+bhat_0 <- summary(model_3a)$coefficients[1,1]
+bhat_1 <- summary(model_3a)$coefficients[2,1]
+rse <- summary(model_3a)$sigma
+rss <- rse ^ 2 * (n - 2)
+mse <- rss / n 
+
+#point estimate
+ptestimate <- bhat_0 + bhat_1 * 130
+ptestimate
+
+lowerpred <- ptestimate - (qt(1 - (alpha / 2), n - 2) * sqrt(mse) * sqrt(1 + (1 / n)))
+lowerpred
+upperpred <- ptestimate + (qt(1 - (alpha / 2), n - 2) * sqrt(mse) * sqrt(1 + (1 / n)))
+upperpred
+```
+
+A point estimate for the time taken to process 130 invoices is `r ptestimate` hours.
+
+The prediction interval is (`r lowerpred`, `r upperpred`).
+
+-----
+
+## 4.
+
+### (a)
+
+Using assumption (1) : $Y$ is related to $x$ by the simple linear regression model $Y_{i}=\beta x_{i}+e_{i} (i=1,2,...,n)$ and using $RSS=\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^2$
+
+$$\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^2$$
+
+$$=\sum_{i=1}^{n}(y_{i}-\hat{\beta}x_{i})^2$$
+
+$$\displaystyle \frac{\partial}{\partial \beta}\bigg(\sum_{i=1}^{n}(y_{i}-\hat{\beta}x_{i})^2\bigg)$$
+
+$$=-2\sum_{i=1}^{n}x_{i}(y_{i}-\hat{\beta}x_{i})$$
+
+$$-2\sum_{i=1}^{n}x_{i}(y_{i}-\hat{\beta}x_{i})=0$$
+
+$$\sum_{i=1}^{n}x_{i}(y_{i}-\hat{\beta}x_{i})=0$$
+
+$$\sum_{i=1}^{n}x_{i}y_{i}-\hat{\beta}x_{i}^2=0$$
+
+$$\sum_{i=1}^{n}x_{i}y_{i}-\sum_{i=1}^{n}\hat{\beta}x_{i}^2=0$$
+
+$$\sum_{i=1}^{n}x_{i}y_{i}-\hat{\beta}\sum_{i=1}^{n}x_{i}^2=0$$
+
+$$\hat{\beta}\sum_{i=1}^{n}x_{i}^2=\sum_{i=1}^{n}x_{i}y_{i}$$
+
+$$\hat{\beta}=\displaystyle \frac{\sum_{i=1}^{n}x_{i}y_{i}}{\sum_{i=1}^{n}x_{i}^2}$$
+
+-----
+
+### (b)
+
+#### (i)
+
+From the question, we know that $\hat{\beta}=\displaystyle \frac{\sum_{i=1}^{n}x_{i}y_{i}}{\sum_{i=1}^{n}x_{i}^2}$
+
+$$E(\hat{\beta}|X)$$
+
+$$=E\bigg(\displaystyle \frac{\sum_{i=1}^{n}x_{i}y_{i}}{\sum_{i=1}^{n}x_{i}^2}|X=x_{i}\bigg)$$
+
+$$=E\bigg(\displaystyle \frac{\sum_{i=1}^{n}x_{i}y_{i}}{\sum_{i=1}^{n}x_{i}^2}\bigg)$$
+
+$$=\displaystyle \frac{E(\sum_{i=1}^{n}x_{i}y_{i})}{E(\sum_{i=1}^{n}x_{i}^2)}$$
+
+$$=\displaystyle \frac{\sum_{i=1}^{n}x_{i}E(y_{i})}{\sum_{i=1}^{n}x_{i}^2}$$
+
+From assumption (1), $Y_{i}=\beta x_{i}+e_{i} (i=1,2,...,n)$, then $E(y_{i})=\beta x_{i}$
+
+$$=\displaystyle \frac{\sum_{i=1}^{n}x_{i}*\beta x_{i}}{\sum_{i=1}^{n}x_{i}^2}$$
+
+$$=\beta\displaystyle \frac{\sum_{i=1}^{n}x_{i}*x_{i}}{\sum_{i=1}^{n}x_{i}^2}$$
+
+$$=\beta\displaystyle \frac{\sum_{i=1}^{n}x_{i}^2}{\sum_{i=1}^{n}x_{i}^2}$$
+
+$$=\beta$$
+
+-----
+
+#### (ii)
+
+From the question, we know that $\hat{\beta}=\displaystyle \frac{\sum_{i=1}^{n}x_{i}y_{i}}{\sum_{i=1}^{n}x_{i}^2}$
+
+$$Var(\hat{\beta}|X)$$
+
+$$=Var\bigg(\displaystyle \frac{\sum_{i=1}^{n}x_{i}y_{i}}{\sum_{i=1}^{n}x_{i}^2}|X=x_{i}\bigg)$$
+
+$$=Var\bigg(\displaystyle \frac{\sum_{i=1}^{n}x_{i}y_{i}}{\sum_{i=1}^{n}x_{i}^2}\bigg)$$
+
+$$=\displaystyle \frac{Var(\sum_{i=1}^{n}x_{i}y_{i})}{Var(\sum_{i=1}^{n}x_{i}^2)}$$
+
+$$=\displaystyle \frac{\sum_{i=1}^{n}x_{i}Var(y_{i})}{(\sum_{i=1}^{n}x_{i}^2)^2}$$
+
+From assumption (1), $Y_{i}=\beta x_{i}+e_{i} (i=1,2,...,n)$, then $Var(y_{i})=\sigma^2 x_{i}$
+
+$$=\displaystyle \frac{\sum_{i=1}^{n}x_{i}*\sigma^2 x_{i}}{(\sum_{i=1}^{n}x_{i}^2)^2}$$
+
+$$=\sigma^2\displaystyle \frac{\sum_{i=1}^{n}x_{i}* x_{i}}{(\sum_{i=1}^{n}x_{i}^2)^2}$$
+
+$$=\sigma^2\displaystyle \frac{\sum_{i=1}^{n}x_{i}^2}{(\sum_{i=1}^{n}x_{i}^2)^2}$$
+
+$$=\displaystyle \frac{\sigma^2}{\sum_{i=1}^{n}x_{i}^2}$$
+
+-----
+
+#### (iii)
+
+Under assumption (4): The errors are normally distributed with a mean of 0 and variance $\sigma^2$ (especially when the sample size is small), then $\hat{\beta}|X$ is normally distributed.
+
+-----
+
+## 5.
+
+Looking at the plots for Model 1 and Model 2, the lines represent the least squares regression lines. In Model 1, the coordinated pair points are closer to the least squares regression line. In Model 2, the coordinated pair points are far away from the least squares regression line. This means that RSS for Model1 is less than the RSS for Model 2. The SSreg for Model 1 must be greater than the SSreg for Model 2 because most of the sum of squares of Model 1 is explained by the variance.
+
+Therefore, (d) is correct: RSS for model 1 is less than RSS for model 2, while SSreg for model 1 is greater than SSreg for model 2.
+
+-----
+
+## 6.
+
+### (a)
+
+$$(y_{i}-\hat{y}_{i})$$
+
+$$=(y_{i}-\bar{y})-(\hat{y}_{i}-\bar{y})$$
+Assuming that $\beta_{1}\neq0$, then $\hat{y}_{i}=\hat{\beta}_{0}+\hat{\beta}_{1}\hat{x}_{i}$ and $\bar{y}=\hat{\beta}_{0}+\hat{\beta}_{1}\bar{x}$
+
+$$=(y_{i}-\bar{y})-(\hat{\beta}_{1}x_{i}-\hat{\beta}_{1}\bar{x})$$
+
+$$=(y_{i}-\bar{y})-\hat{\beta}_{1}(x_{i}-\bar{x})$$
+
+-----
+
+### (b)
+
+From the question,
+
+$$(y_{i}-\hat{y}_{i})$$
+
+$$=(y_{i}-\bar{y})-(\hat{y}_{i}-\bar{y})$$
+
+$$=(y_{i}-\bar{y})-\hat{\beta}_{1}(x_{i}-\bar{x})$$
+
+then
+
+$$(\hat{y}_{i}-\bar{y})=\hat{\beta}_{1}(x_{i}-\bar{x})$$
+
+-----
+
+### (c)
+
+$$\sum_{i=1}^n(y_{i}-\hat{y}_{i})(\hat{y}_{i}-\bar{y})$$
+Since $\hat{y}_{i}=\hat{\beta}_{0}+\hat{\beta}_{1}\hat{x}_{i}$ and $(\hat{y}_{i}-\bar{y})=\hat{\beta}_{1}(x_{i}-\bar{x})$
+
+$$=\sum_{i=1}^n(y_{i}-(\hat{\beta}_{0}+\hat{\beta}_{1}x_{i}))\hat{\beta}_{1}(x_{i}-\bar{x})$$
+
+$$=\sum_{i=1}^n(y_{i}-\hat{\beta}_{0}-\hat{\beta}_{1}x_{i})\hat{\beta}_{1}(x_{i}-\bar{x})$$
+
+$$=\hat{\beta}_{1}\sum_{i=1}^n(y_{i}-\hat{\beta}_{0}-\hat{\beta}_{1}x_{i})(x_{i}-\bar{x})$$
+
+$$=\hat{\beta}_{1}\sum_{i=1}^n(x_{i}y_{i}-\bar{x}y_{i}-\hat{\beta}_{0}x_{i}-\hat{\beta}_{0}\bar{x}-\hat{\beta}_{1}x_{i}^2-\hat{\beta}_{1}x_{i}\bar{x})$$
+
+$$=\hat{\beta}_{1}\bigg(\sum_{i=1}^n(x_{i}y_{i}-\bar{x}y_{i})-\sum_{i=1}^{n}(\hat{\beta}_{0}x_{i}-\hat{\beta}_{0}\bar{x})-\sum_{i=1}^{n}(\hat{\beta}_{1}x_{i}^2-\hat{\beta}_{1}x_{i}\bar{x})\bigg)$$
+
+$$=\hat{\beta}_{1}\bigg(\sum_{i=1}^ny_{i}(x_{i}-\bar{x})-\sum_{i=1}^{n}\hat{\beta}_{0}(x_{i}-\bar{x})-\sum_{i=1}^{n}\hat{\beta}_{1}x_{i}(x_{i}-\bar{x})\bigg)$$
+
+$$=\hat{\beta}_{1}\bigg(\sum_{i=1}^ny_{i}(x_{i}-\bar{x})-\hat{\beta}_{0}\sum_{i=1}^{n}(x_{i}-\bar{x})-\hat{\beta}_{1}\sum_{i=1}^{n}x_{i}(x_{i}-\bar{x})\bigg)$$
+
+Since $\sum_{i=1}^{n}(x_{i}-\bar{x})=0$, then
+
+$$=\hat{\beta}_{1}\bigg(\sum_{i=1}^ny_{i}(x_{i}-\bar{x})-0-\hat{\beta}_{1}\sum_{i=1}^{n}x_{i}(x_{i}-\bar{x})\bigg)$$
+
+And since $\sum_{i=1}^{n}x_{i}(x_{i}-\bar{x})=SXX$ and $\sum_{i=1}^{n}y_{i}(x_{i}-\bar{x})=SXy$, then
+
+$$=\hat{\beta}_{1}(SXY-0-\hat{\beta}_{1}SXX)$$
+
+And given in the question, $\hat{\beta}_{1}=\displaystyle \frac{SXY}{SXX}$, then
+
+$$=\hat{\beta}_{1}\bigg(SXY-\displaystyle \frac{SXY}{SXX}SXX\bigg)$$
+
+$$=\hat{\beta}_{1}(SXY-SXY)$$
+
+$$=\hat{\beta}_{1}(0)$$
+
+$$=0$$
