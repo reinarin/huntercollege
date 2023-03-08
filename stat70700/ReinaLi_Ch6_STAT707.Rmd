@@ -1,0 +1,287 @@
+---
+title: "Spring 2023 STAT 707 Chapter 6 Homework"
+author: "Reina Li"
+output: pdf_document
+---
+
+# Chapter 6: 6.15, 6.16, 6.17, 6.22, the quadratic form for SS
+
+## 6.15 Patient satisfaction. A hospital administrator wished to study the relation between patient satisfaction (Y) and patient's age ($X_1$, in years), severity of illness ($X_2$, an index), and anxiety level ($X_3$, an index). The administrator randomly selected 46 patients and collected the data presented below, where larger values of Y, $X_2$, and $X_3$ are, respectively, associated with more satisfaction, increased severity of illness, and more anxiety.
+
+```{r problem_setup, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Import data set
+df <- read.table("CH06PR15.txt")
+# Set column names
+colnames(df) <- c("Y", "X1", "X2", "X3")
+# Data frame with interaction terms
+df2 <- cbind(df, data.frame(X1X2 = df$X1 * df$X2,
+                            X1X3 = df$X1 * df$X3,
+                            X2X3 = df$X2 * df$X3))
+```
+
+### a. Prepare a stem-and-leaf plot for each of the predictor variables. Are any noteworthy features revealed by these plots?
+
+```{r 615a, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Stem and leaf plot for X1
+stem(df$X1, scale = 0.5)
+# Stem and leaf plot for X2
+stem(df$X2, scale = 0.25)
+# Stem and leaf plot for X3
+stem(df$X3, scale = 0.125)
+```
+
+X1 seems to be display an almost symmetric distribution with no apparent outliers. X2 seems to illustrate a right-skewed, non-normal distribution, peaking in the 50's. X3 seems to illustrate a left-skewed, non-normal distribution, peaking in the 2.0's.
+
+### b. Obtain the scatter plot matrix and the correlation matrix. Interpret these and state your principal findings.
+
+```{r 615b, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Scatter plot matrix
+pairs(df)
+# Correlation matrix
+cor(df)
+```
+
+From the scatter plot matrix and the correlation matrix, we can conclude the $Y$ is negatively, linearly correlated to $X_1$, $X_2$, and $X_3$. The negative linear correlation is strongest between $Y$ and $X_1$ (-0.787).
+
+### c. Fit regression model (6.5) for three predictor variables to the data and state the estimated regression function. How is $b_2$ interpreted here?
+
+```{r 615c, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Fit regression model
+model <- lm(Y ~ X1 + X2 + X3, data = df)
+# View summary
+summary(model)
+```
+
+The estimate regression function is: $\hat{Y}=$ `r round(model$coefficients[1][[1]],4)` + `r round(model$coefficients[2][[1]],4)`$X_1$ + `r round(model$coefficients[3][[1]],4)`$X_2$ + `r round(model$coefficients[4][[1]],4)`$X_3$
+
+Under the assumption that the other variables $X_1$ and $X_3$ are fixed, the coefficient $b_2$ represents that when $X_2$ is increasing by 1 unit, Y will decrease by 0.4420.
+
+### d. Obtain the residuals and prepare a box plot of the residuals. Do there appear to be any outliers?
+
+```{r 615d, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Residuals
+res <- model$residuals
+res
+# Box plot of residuals
+boxplot(res)
+```
+
+No, there does not appear to be any outliers.
+
+### e. Plot the residuals against $\hat{Y}$, each of the predictor variables, and each two-factor interaction term on separate graphs. Also prepare a normal probability plot. Interpret your plots and summarize your findings.
+
+```{r 615e, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# Plot of residuals against Y_hat
+plot(res ~ predict(model), xlab = "Y_hat", ylab = "Residuals"); abline(0,0, lty = 3)
+# Plot of residuals against X1
+plot(res ~ df$X1, xlab = "X1", ylab = "Residuals"); abline(0,0, lty = 3)
+# Plot of residuals against X2
+plot(res ~ df$X2, xlab = "X2", ylab = "Residuals"); abline(0,0, lty = 3)
+# Plot of residuals against X3
+plot(res ~ df$X3, xlab = "X3", ylab = "Residuals"); abline(0,0, lty = 3)
+# Plot of residuals against X1X2
+plot(res ~ df2$X1X2, xlab = "X1X2", ylab = "Residuals"); abline(0,0, lty = 3)
+# Plot of residuals against X1X3
+plot(res ~ df2$X1X3, xlab = "X1X3", ylab = "Residuals"); abline(0,0, lty = 3)
+# Plot of residuals against X2X3
+plot(res ~ df2$X2X3, xlab = "X2X3", ylab = "Residuals"); abline(0,0, lty = 3)
+# Normal probability plot
+plot(model, which = 2)
+```
+
+For the residual plots, the data points are scattered randomly around the residual = 0 line. There is no cluster and no pattern. We can conclude that a linear model is an an appropriate model.
+
+### f. Can you conduct a formal test for lack of fit here?
+
+There is no need to conduct a formal test for lack of test because the model seems to be a good model of the data.
+
+### g. Conduct the Breusch-Pagan test for constancy of the error variance, assuming log $\sigma_i^2= \gamma_0 + \gamma_1X_{i1} + \gamma_2X_{i2} + \gamma_3X_{i3}$; use $\alpha=.01$. State the alternatives, decision rule, and conclusion.
+
+```{r 615g, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+n <- dim(df)[1]
+p <- dim(df)[2]
+alpha <- 0.10
+X <- as.matrix(cbind(matrix(1, n, 1), df$X1, df$X2, df$X3))
+Y <- as.matrix(df$Y)
+b <- as.matrix(c(model$coefficients[1][[1]],
+                 model$coefficients[2][[1]],
+                 model$coefficients[3][[1]],
+                 model$coefficients[4][[1]]))
+# SSE = Y'Y - b'X'Y
+sse <- t(Y) %*% Y - t(b) %*% t(X) %*% Y
+sse
+# SSR*
+# Fit a new linear regression model of squared residuals against predictor variables
+model_ssr <- lm(res^2 ~ X1 + X2 + X3, data = df)
+# Extract the SSR*
+ssr_star <- anova(model_ssr)$`Sum Sq`[1]
+ssr_star
+# Test statistic: X_(BP)^2* = SSR*/2 / (SSE/n)^2
+test_stat <- (ssr_star/2) / ((sse/n)^2)
+test_stat
+# Critical value
+crit_val <- qchisq(1-0.01,p-1)
+crit_val
+```
+
+$H_0: \gamma_1 = 0, \gamma_2 = 0$, and $\gamma_3 = 0$ (error variance is constant/homoskedasticity)    
+$H_\alpha:$ at least one $\gamma_k \neq 0$, $(k = 1, 2, 3)$ (error variance is not constant/heteroskedasticity)
+
+$X_{BP}^2$ = `r round(test_stat,4)`  
+$\chi_{(0.99,3)}^2$ = `r round(crit_val,4)`
+
+Decision rule:  
+If $X_{BP}^2$ $\le$ $\chi_{(0.99,3)}^2$, conclude $H_0$  
+If $X_{BP}^2$ $>$ $\chi_{(0.99,3)}^2$, conclude $H_\alpha$  
+
+Conclusion:  
+$X_{BP}^2$ $\le$ $\chi_{(0.99,3)}^2$  
+Conclude $H_0$. Fail to reject the null hypothesis $H_0$. The test implies that $\gamma_1 = 0, \gamma_2 = 0$, and $\gamma_3 = 0$ and that the error variance is constant.
+
+## 6.16 Refer to Patient satisfaction Problem 6.15. Assume that regression model (6.5) for three predictor variables with independent normal error terms is appropriate.
+
+### a. Test whether there is a regression relation; use $\alpha=.10$. State the alternatives, decision rule, and conclusion. What does your test imply about $\beta_1$, $\beta_2$, and $\beta_3$? What is the P-value of the test?
+
+```{r 616a, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# SSTO = Y'Y - (1/n)Y'JY
+ssto <- t(Y) %*% Y - (1/n) * t(Y) %*% matrix(1,n,n) %*% Y
+ssto
+# SSE = Y'Y - b'X'Y
+sse <- t(Y) %*% Y - t(b) %*% t(X) %*% Y
+sse
+# SSR = SSTO - SSE
+ssr <- ssto - sse
+ssr
+# MSR = SSR / p-1
+msr <- ssr / (p-1)
+msr
+# MSE = SSE / n-p
+mse <- sse / (n-p)
+mse
+# Test statistic: F* = MSR / MSE
+# Alternative method: summary(model)$fstatistic[1]
+test_stat <- msr / mse
+test_stat
+# Critical value
+crit_val <- qf(1-alpha, p-1, n-p)
+crit_val
+# P-value
+p_val <- 1 - pf(test_stat, p-1, n-p)
+p_val
+```
+
+$H_0: \beta_1 = 0, \beta_2 = 0$, and $\beta_3 = 0$  
+$H_\alpha:$ at least one $\beta_k \neq 0$, $(k = 1, 2, 3)$
+
+F* = `r round(test_stat,4)`  
+F(0.90, 3, 42) = `r round(crit_val,4)`
+
+Decision rule:  
+If F* $\le$ F(0.90, 3, 42), conclude $H_0$  
+If F* $>$ F(0.90, 3, 42), conclude $H_\alpha$  
+
+Conclusion:  
+F* > F(0.90, 3, 42)  
+Conclude $H_\alpha$. Reject $H_0$. The test implies that at least one of $\beta_k \neq 0,(k = 1, 2, 3)$ and that Y is related to $X_1$, $X_2$, and $X_3$.
+
+P-value: `r p_val`    
+
+### b. Obtain joint interval estimates of $\beta_1$, $\beta_2$, and $\beta_3$, using a 90 percent family confidence coefficient. Interpret your results.
+
+```{r 616b, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# b_k +- B_s{b_k}
+# where B = t(1-alpha/2g; n-p)
+# g: # of parameters
+s_squared_b <- as.numeric(mse) * solve(t(X) %*% X)
+s_b1 <- s_squared_b[2,2]^0.5
+s_b2 <- s_squared_b[3,3]^0.5
+s_b3 <- s_squared_b[4,4]^0.5
+B <- qt((1-0.10/(2*3)), n-p)
+# Confidence interval for beta_1
+beta1_lwr <- b[2] - B * s_b1
+beta1_upr <- b[2] + B * s_b1
+beta1_int <- c(beta1_lwr, beta1_upr)
+names(beta1_int) <- c("lower", "upper")
+beta1_int
+# Confidence interval for beta_2
+beta2_lwr <- b[3] - B * s_b2
+beta2_upr <- b[3] + B * s_b2
+beta2_int <- c(beta2_lwr, beta2_upr)
+names(beta2_int) <- c("lower", "upper")
+beta2_int
+# Confidence interval for beta_3
+beta3_lwr <- b[4] - B * s_b3
+beta3_upr <- b[4] + B * s_b3
+beta3_int <- c(beta3_lwr, beta3_upr)
+names(beta3_int) <- c("lower", "upper")
+beta3_int
+```
+
+There is 90% confidence that the true $\beta_1$ will be between `r round(beta1_int[1],4)` and `r round(beta1_int[2],4)`. There is 90% confidence that the true $\beta_2$ will be between `r round(beta2_int[1],4)` and `r round(beta2_int[2],4)`. There is 90% confidence that the true $\beta_3$ will be between `r round(beta3_int[1],4)` and `r round(beta3_int[2],4)`.
+
+### c. Calculate the coefficient of multiple determination. What does it indicate here?
+
+```{r 616c, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+# R^2 = SSR / SSTO
+R2 <- ssr / ssto
+R2
+```
+
+It indicates that when the three predictor values ($X_1$, $X_2$, and $X_3$) are considered, the variation in Y is reduced by `r round(R2,4)*100`%.
+
+## 6.17 Refer to Patient satisfaction Problem 6.15. Assume that regression model (6.5) for three predictor variables with independent normal error terms is appropriate.
+
+### a. Obtain an interval estimate of the mean satisfaction when $X_{h1} = 35$, $X_{h2} = 45$, and $X_{h3} = 2.2$. Use a 90 percent confidence coefficient. Interpret your confidence interval.
+
+```{r 617a, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+predict_int <- predict(model, data.frame(X1 = 35, X2 = 45, X3 = 2.2),
+                       interval = "confidence", level = 0.90)
+predict_int
+```
+
+There is 90% confidence that the true response value is between `r round(predict_int[2],4)` and `r round(predict_int[3],4)`.
+
+### b. Obtain a predictor interval for a new patient's satisfaction when $X_{h1} = 35$, $X_{h2} = 45$, and $X_{h3} = 2.2$. Use a 90 percent confidence coefficient. Interpret your prediction interval.
+
+```{r 617b, echo = TRUE, include = TRUE, results = TRUE, warning = FALSE, message = FALSE}
+predict_int <- predict(model, data.frame(X1 = 35, X2 = 45, X3 = 2.2),
+                       interval = "prediction", level = 0.90)
+predict_int
+```
+
+There is 90% confidence that the true response value is between `r round(predict_int[2],4)` and `r round(predict_int[3],4)`.
+
+## 6.22 For each of the following regression models, indicate whether it is a general linear regression model. If it is not, state whether it can be expressed in the form of (6.7) by a suitable transformation:
+
+### a. $Y_i = \beta_0 + \beta_1X_{i1} + \beta_2log_{10}X_{i2} + \beta_3X_{i1}^2 + \varepsilon_i$
+
+Yes, this is a general linear regression model.
+
+### b. $Y_i = \varepsilon_iexp(\beta_0 + \beta_1X_{i1} + \beta_2X_{i2}^2)$
+
+No, this is not a general linear regression model. That is because there are non-linear predictor terms. It can be expressed in the form of (6.7) by taking the ln of $Y_i$:   
+$Y_i = \varepsilon_iexp(\beta_0 + \beta_1X_{i1} + \beta_2X_{i2}^2)$    
+$ln(Y_i)=ln(\varepsilon_iexp(\beta_0 + \beta_1X_{i1} + \beta_2X_{i2}^2))$    
+$ln(Y_i)=ln(\varepsilon_i) + ln(exp(\beta_0 + \beta_1X_{i1} + \beta_2X_{i2}^2))$    
+$ln(Y_i)=\beta_0+\beta_1X_{i1}+\beta_2X_{i2}^2+ln(\varepsilon_i)$
+
+### c. $Y_i = log_{10}(\beta_1X_{i1}) + \beta_2X_{i2} + \varepsilon_i$
+
+Yes, this is a general linear regression model.
+
+### d. $Y_i = \beta_0exp(\beta_1X_{i1}) + \varepsilon_i$
+
+No, this is not a general linear regression model. That is because it contains an exponential predictor term. It can be expressed in the form of (6.7) by taking the ln of $Y_i$:    
+$Y_i = \beta_0exp(\beta_1X_{i1}) + \varepsilon_i$   
+$ln(Y_i) = ln(\beta_0exp(\beta_1X_{i1}) + \varepsilon_i)$    
+$ln(Y_i) = ln(\beta_0)+ln(exp(\beta_1X_{i1}) + ln(\varepsilon_i))$     
+$ln(Y_i) = ln(\beta_0)+\beta_1X_{i1} + ln(\varepsilon_i)$
+
+### e. $Y_i = [1 + exp(\beta_0 + \beta_1X_{i1} + \varepsilon_i)]^{-1}$
+
+No, this is not a general linear regression model. That is because it contains exponential predictor terms. It can be expressed in the form of (6.7) by taking the ln of $Y_i$:    
+$Y_i = [1 + exp(\beta_0 + \beta_1X_{i1} + \varepsilon_i)]^{-1}$    
+$ln(Y_i) = ln([1 + exp(\beta_0 + \beta_1X_{i1} + \varepsilon_i)]^{-1})$    
+$ln(Y_i) = -ln([1 + exp(\beta_0 + \beta_1X_{i1} + \varepsilon_i)])$    
+$ln(Y_i) = -ln(1) + ln(exp(\beta_0 + \beta_1X_{i1} + \varepsilon_i))$    
+$ln(Y_i) = \beta_0 + \beta_1X_{i1} + \varepsilon_i$   
